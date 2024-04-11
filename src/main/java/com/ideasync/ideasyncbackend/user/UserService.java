@@ -1,11 +1,7 @@
 package com.ideasync.ideasyncbackend.user;
 
-import com.fasterxml.jackson.databind.util.JSONPObject;
-
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.HashMap;
-import java.util.Map;
 import org.springframework.stereotype.Service;
 
 
@@ -31,16 +27,16 @@ public class UserService {
     String firstName = user.getFirstName();
     String lastName = user.getLastName();
 
-    if ((username.isEmpty() || username == null)
-    || (password.isEmpty() || password == null)
-    || (nickName.isEmpty() || nickName == null)
-    || (profileDescription.isEmpty() || profileDescription == null)
-    || (roleName.isEmpty() || roleName == null)
-    || (email.isEmpty() || email == null)
-    || (firstName.isEmpty() || firstName == null)
-    || (lastName.isEmpty() || lastName == null)) {
+    if ((username == null || username.isEmpty())
+        || (password == null || password.isEmpty())
+        || (nickName == null || nickName.isEmpty())
+        || (profileDescription == null || profileDescription.isEmpty())
+        || (roleName == null || roleName.isEmpty())
+        || (email == null || email.isEmpty())
+        || (firstName == null || firstName.isEmpty())
+        || (lastName == null || lastName.isEmpty())) {
       return false;
-    }
+}
 
     // check email, username, password pattern
     if (!username.matches("^[a-zA-Z0-9]{7,}$")) {
@@ -57,7 +53,7 @@ public class UserService {
   }
   public String registerUser(User user) {
     // verify user data
-    Boolean isValidUserRegistrationData = verifyRegistrationData(user);
+    boolean isValidUserRegistrationData = verifyRegistrationData(user);
     if (isValidUserRegistrationData) {
       userRepository.save(user);
       return "User registered successfully";
