@@ -1,0 +1,152 @@
+package com.ideasync.ideasyncbackend.project;
+import com.ideasync.ideasyncbackend.applicant.Applicant;
+import com.ideasync.ideasyncbackend.comment.Comment;
+import com.ideasync.ideasyncbackend.projectimage.ProjectImage;
+import com.ideasync.ideasyncbackend.projectstatus.ProjectStatus;
+import com.ideasync.ideasyncbackend.tag.Tag;
+import com.ideasync.ideasyncbackend.user.User;
+import jakarta.persistence.*;
+
+import java.util.List;
+
+@Entity
+@Table(name = "project")
+public class Project {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
+
+  @ManyToOne
+  @JoinColumn(name = "hostUserId", nullable = false)
+  private User user;
+
+  @Column(nullable = false)
+  private String description;
+
+  @ManyToOne
+  @JoinColumn(name = "statusId", nullable = false)
+  private ProjectStatus projectStatus;
+
+  @Column(name = "isGraduationProject", nullable = false)
+  private boolean isGraduationProject;
+
+  @Column(nullable = false)
+  private String school;
+
+  @Column(name = "allowApplicantsNum", nullable = false)
+  private int allowApplicantsNum;
+
+  @Column(name = "applicantCount", nullable = false)
+  private int applicantCount;
+
+  @OneToMany(mappedBy = "project")
+  private List<ProjectImage> projectImages;
+
+  @OneToMany(mappedBy = "project")
+  private List<Tag> tags;
+
+  @OneToMany(mappedBy = "project")
+  private List<Comment> comments;
+
+  @OneToMany(mappedBy = "project")
+  private List<Applicant> applicants;
+  // Constructors, getters, and setters
+
+  public Long getId() {
+    return id;
+  }
+
+  public User getUser() {
+    return user;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public ProjectStatus getProjectStatus() {
+    return projectStatus;
+  }
+
+  public boolean isGraduationProject() {
+    return isGraduationProject;
+  }
+
+  public String getSchool() {
+    return school;
+  }
+
+  public int getAllowApplicantsNum() {
+    return allowApplicantsNum;
+  }
+
+  public int getApplicantCount() {
+    return applicantCount;
+  }
+
+  public List<ProjectImage> getProjectImages() {
+    return projectImages;
+  }
+
+  public List<Tag> getTags() {
+    return tags;
+  }
+
+  public List<Comment> getComments() {
+    return comments;
+  }
+
+  public List<Applicant> getApplicants() {
+    return applicants;
+  }
+
+  public void setId(Long id) {
+    this.id = id;
+  }
+
+  public void setUser(User user) {
+    this.user = user;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
+  }
+
+  public void setProjectStatus(ProjectStatus projectStatus) {
+    this.projectStatus = projectStatus;
+  }
+
+  public void setGraduationProject(boolean graduationProject) {
+    isGraduationProject = graduationProject;
+  }
+
+  public void setSchool(String school) {
+    this.school = school;
+  }
+
+  public void setAllowApplicantsNum(int allowApplicantsNum) {
+    this.allowApplicantsNum = allowApplicantsNum;
+  }
+
+  public void setApplicantCount(int applicantCount) {
+    this.applicantCount = applicantCount;
+  }
+
+  public void setProjectImages(List<ProjectImage> projectImages) {
+    this.projectImages = projectImages;
+  }
+
+  public void setTags(List<Tag> tags) {
+    this.tags = tags;
+  }
+
+  public void setComments(List<Comment> comments) {
+    this.comments = comments;
+  }
+
+  public void setApplicants(List<Applicant> applicants) {
+    this.applicants = applicants;
+  }
+}
+
