@@ -36,7 +36,7 @@ public class UserService {
         || (firstName == null || firstName.isEmpty())
         || (lastName == null || lastName.isEmpty())) {
       return false;
-}
+    }
 
     // check email, username, password pattern
     if (!username.matches("^[a-zA-Z0-9]{7,}$")) {
@@ -46,8 +46,6 @@ public class UserService {
     } else if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
       return false;
     }
-
-    // use buildin verifier to verify email
 
     return true;
   }
