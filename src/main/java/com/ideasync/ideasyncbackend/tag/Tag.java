@@ -2,6 +2,9 @@ package com.ideasync.ideasyncbackend.tag;
 import jakarta.persistence.*;
 
 import com.ideasync.ideasyncbackend.project.Project;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "tag")
@@ -10,6 +13,11 @@ public class Tag {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
+
+  @CreationTimestamp
+  @Column(name = "createAt", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  private Timestamp createAt;
 
   @ManyToOne
   @JoinColumn(name = "projectId", nullable = false)
@@ -30,6 +38,14 @@ public class Tag {
 
   public String getName() {
     return name;
+  }
+
+  public Timestamp getCreateAt() {
+    return createAt;
+  }
+
+  public void setCreateAt(Timestamp createAt) {
+    this.createAt = createAt;
   }
 
   public void setId(Long id) {

@@ -6,7 +6,9 @@ import com.ideasync.ideasyncbackend.project.Project;
 import com.ideasync.ideasyncbackend.userrole.UserRole;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Entity
@@ -19,6 +21,10 @@ public class User {
 
   @Column(name = "userName", nullable = false, unique = true)
   private String userName;
+
+  @CreationTimestamp
+  @Column(name = "createAt", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  private Timestamp createAt;
 
   @Column(nullable = false)
   private String password;
@@ -203,5 +209,13 @@ public class User {
 
   public void setApplicants(List<Applicant> applicants) {
     this.applicants = applicants;
+  }
+
+  public Timestamp getCreateAt() {
+    return createAt;
+  }
+
+  public void setCreateAt(Timestamp createAt) {
+    this.createAt = createAt;
   }
 }

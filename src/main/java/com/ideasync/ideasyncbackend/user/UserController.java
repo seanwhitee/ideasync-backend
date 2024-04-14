@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin
 @RestController
 @RequestMapping(path = "api/v1/users")
 public class UserController {
@@ -13,6 +14,7 @@ public class UserController {
   public UserController(UserService userService) {
     this.userService = userService;
   }
+
 
   @PostMapping("/register")
   public String registerUser(@RequestBody User user) {
@@ -22,5 +24,10 @@ public class UserController {
   @GetMapping("/{id}")
   public UserResponse getUser(@PathVariable Long id) {
     return userService.getUser(id);
+  }
+
+  @GetMapping("/login")
+  public UserResponse userLogin(@RequestParam String username, @RequestParam String password) {
+    return userService.userLogin(username, password);
   }
 }

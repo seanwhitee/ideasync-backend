@@ -1,10 +1,12 @@
 package com.ideasync.ideasyncbackend.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.stereotype.Service;
 
 
+/**
+ * Service class for user operations.
+ */
 @Service
 public class UserService {
 
@@ -14,6 +16,44 @@ public class UserService {
   public UserService(UserRepository userRepository) {
     this.userRepository = userRepository;
 
+  }
+
+  /**
+   * Method to login user.
+   *
+   * @param username
+   *        username of user
+   * @param password
+   *        password of user
+   * @return  UserResponse
+   */
+  public UserResponse userLogin(String username, String password) {
+    User userData = userRepository.findByUserName(username);
+    if (userData == null) {
+      return null;
+    }
+    if (userData.getPassword().equals(password)) {
+      return getUserResponse(userData);
+    }
+    return null;
+  }
+
+  private UserResponse getUserResponse(User userData) {
+    UserResponse response = new UserResponse();
+    response.setId(userData.getId());
+    response.setNickName(userData.getNickName());
+    response.setAvatarUrl(userData.getAvatarUrl());
+    response.setRoleName(userData.getUserRole().getRoleName());
+    response.setProfileDescription(userData.getProfileDescription());
+    response.setEmail(userData.getEmail());
+    response.setFirstName(userData.getFirstName());
+    response.setLastName(userData.getLastName());
+    response.setAllowProjectApply(userData.isAllowProjectApply());
+    response.setAllowProjectCreate(userData.isAllowProjectCreate());
+    response.setRoleVerified(userData.isRoleVerified());
+    response.setEmailVerified(userData.isEmailVerified());
+
+    return response;
   }
 
   private boolean verifyRegistrationData(User user) {
@@ -49,35 +89,41 @@ public class UserService {
 
     return true;
   }
+
+  /**
+   * Method to register user.
+   *
+   * @param user
+   *        user data
+   * @return String
+   */
   public String registerUser(User user) {
+    User existingUser = userRepository.findByUserName(user.getUserName());
+    if (existingUser != null) {
+      return "user already exist";
+    }
     // verify user data
     boolean isValidUserRegistrationData = verifyRegistrationData(user);
     if (isValidUserRegistrationData) {
       userRepository.save(user);
-      return "User registered successfully";
+      return "user registered successfully";
     }
-    return "User registration failed, data is not valid";
+    return "user registration failed, data is not valid";
   }
 
+
+  /**
+   * Method to get user by id.
+   *
+   * @param id
+   *       user id
+   * @return UserResponse
+   */
   public UserResponse getUser(Long id) {
     User userData = userRepository.findById(id).orElse(null);
     if (userData == null) {
       return null;
     }
-    UserResponse response = new UserResponse();
-    response.setId(userData.getId());
-    response.setNickName(userData.getNickName());
-    response.setAvatarUrl(userData.getAvatarUrl());
-    response.setRoleName(userData.getUserRole().getRoleName());
-    response.setProfileDescription(userData.getProfileDescription());
-    response.setEmail(userData.getEmail());
-    response.setFirstName(userData.getFirstName());
-    response.setLastName(userData.getLastName());
-    response.setAllowProjectApply(userData.isAllowProjectApply());
-    response.setAllowProjectCreate(userData.isAllowProjectCreate());
-    response.setRoleVerified(userData.isRoleVerified());
-    response.setEmailVerified(userData.isEmailVerified());
-
-    return response;
+    return getUserResponse(userData);
   }
 }
