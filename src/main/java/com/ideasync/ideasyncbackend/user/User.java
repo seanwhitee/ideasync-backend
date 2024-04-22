@@ -19,6 +19,9 @@ public class User {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Column(name = "passcode")
+  private int passcode;
+
   @Column(name = "userName", nullable = false, unique = true)
   private String userName;
 
@@ -217,5 +220,13 @@ public class User {
 
   public void setCreateAt(Timestamp createAt) {
     this.createAt = createAt;
+  }
+
+  public int getPasscode() {
+    return passcode;
+  }
+
+  public void setPasscode(int passcode) {
+    this.passcode = passcode;
   }
 }
