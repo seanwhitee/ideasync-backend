@@ -107,7 +107,7 @@ public class UserService {
     if (isValidUserRegistrationData) {
       userRepository.save(user);
 
-      return "successful user registration";
+      return "user registered successfully";
     }
     return "user registration failed, data is not valid";
   }
