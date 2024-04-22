@@ -29,12 +29,18 @@ public class UserService {
    */
   public UserResponse userLogin(String username, String password) {
     User userData = userRepository.findByUserName(username);
+
+    // check if user exist
     if (userData == null) {
       return null;
     }
+
+    // check if password is correct
     if (userData.getPassword().equals(password)) {
       return getUserResponse(userData);
     }
+
+    // return null if password is incorrect
     return null;
   }
 
