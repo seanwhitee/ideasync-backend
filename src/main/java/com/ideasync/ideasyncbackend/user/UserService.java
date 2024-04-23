@@ -108,6 +108,13 @@ public class UserService {
     if (existingUser != null) {
       return "user already exist";
     }
+
+    // prevent email exist
+    existingUser = userRepository.findByEmail(user.getEmail());
+    if (existingUser != null) {
+      return "email already exist";
+    }
+
     // verify user data
     boolean isValidUserRegistrationData = verifyRegistrationData(user);
     if (isValidUserRegistrationData) {
