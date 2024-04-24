@@ -22,6 +22,13 @@ public class User {
   @Column(name = "userName", nullable = false, unique = true)
   private String userName;
 
+  @Column(name = "passCode")
+  private Integer passCode;
+
+
+  @Column(name = "passCodeCreateTime")
+  private Timestamp passCodeCreateTime;
+
   @CreationTimestamp
   @Column(name = "createAt", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
   private Timestamp createAt;
@@ -48,13 +55,13 @@ public class User {
   @Column(name = "roleVerified", nullable = false)
   private boolean roleVerified;
 
-  @Column(name = "email", nullable = false, unique = true)
+  @Column(name = "email", nullable = false)
   private String email;
 
   @Column(name = "emailVerified", nullable = false)
   private boolean emailVerified;
 
-  @Column(name = "avatarUrl", nullable =  false)
+  @Column(name = "avatarUrl", nullable = false)
   private String avatarUrl;
 
   @Column(name = "firstName", nullable = false)
@@ -143,6 +150,14 @@ public class User {
     return applicants;
   }
 
+  public Integer getPassCode() {
+    return passCode;
+  }
+
+  public Timestamp getPassCodeCreateTime() {
+    return passCodeCreateTime;
+  }
+
   public void setId(Long id) {
     this.id = id;
   }
@@ -217,5 +232,13 @@ public class User {
 
   public void setCreateAt(Timestamp createAt) {
     this.createAt = createAt;
+  }
+
+  public void setPassCode(Integer passCode) {
+    this.passCode = passCode;
+  }
+
+  public void setPassCodeCreateTime(Timestamp passCodeCreateTime) {
+    this.passCodeCreateTime = passCodeCreateTime;
   }
 }

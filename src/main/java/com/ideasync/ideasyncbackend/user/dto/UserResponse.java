@@ -1,4 +1,4 @@
-package com.ideasync.ideasyncbackend.user;
+package com.ideasync.ideasyncbackend.user.dto;
 
 public class UserResponse {
   private Long id;
