@@ -22,13 +22,6 @@ public class User {
   @Column(name = "userName", nullable = false, unique = true)
   private String userName;
 
-  @Column(name = "passCode")
-  private Integer passCode;
-
-
-  @Column(name = "passCodeCreateTime")
-  private Timestamp passCodeCreateTime;
-
   @CreationTimestamp
   @Column(name = "createAt", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
   private Timestamp createAt;
@@ -55,11 +48,8 @@ public class User {
   @Column(name = "roleVerified", nullable = false)
   private boolean roleVerified;
 
-  @Column(name = "email", nullable = false, unique = true)
+  @Column(name = "email", unique = true)
   private String email;
-
-  @Column(name = "emailVerified", nullable = false)
-  private boolean emailVerified;
 
   @Column(name = "avatarUrl", nullable = false)
   private String avatarUrl;
@@ -122,10 +112,6 @@ public class User {
     return email;
   }
 
-  public boolean isEmailVerified() {
-    return emailVerified;
-  }
-
   public String getAvatarUrl() {
     return avatarUrl;
   }
@@ -148,14 +134,6 @@ public class User {
 
   public List<Applicant> getApplicants() {
     return applicants;
-  }
-
-  public Integer getPassCode() {
-    return passCode;
-  }
-
-  public Timestamp getPassCodeCreateTime() {
-    return passCodeCreateTime;
   }
 
   public void setId(Long id) {
@@ -198,10 +176,6 @@ public class User {
     this.email = email;
   }
 
-  public void setEmailVerified(boolean emailVerified) {
-    this.emailVerified = emailVerified;
-  }
-
   public void setAvatarUrl(String avatarUrl) {
     this.avatarUrl = avatarUrl;
   }
@@ -234,11 +208,4 @@ public class User {
     this.createAt = createAt;
   }
 
-  public void setPassCode(Integer passCode) {
-    this.passCode = passCode;
-  }
-
-  public void setPassCodeCreateTime(Timestamp passCodeCreateTime) {
-    this.passCodeCreateTime = passCodeCreateTime;
-  }
 }

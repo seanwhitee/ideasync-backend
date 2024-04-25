@@ -1,13 +1,8 @@
 package com.ideasync.ideasyncbackend.user;
 
-import com.ideasync.ideasyncbackend.user.dto.PassCodeResponse;
 import com.ideasync.ideasyncbackend.user.dto.UserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-
-import java.sql.Timestamp;
 
 
 /**
@@ -17,13 +12,10 @@ import java.sql.Timestamp;
 public class UserService {
 
   private final UserRepository userRepository;
-  private final JavaMailSender emailSender;
 
   @Autowired
-  public UserService(UserRepository userRepository, JavaMailSender emailSender) {
+  public UserService(UserRepository userRepository) {
     this.userRepository = userRepository;
-    this.emailSender = emailSender;
-
   }
 
   /**
@@ -63,19 +55,17 @@ public class UserService {
     response.setAllowProjectApply(userData.isAllowProjectApply());
     response.setAllowProjectCreate(userData.isAllowProjectCreate());
     response.setRoleVerified(userData.isRoleVerified());
-    response.setEmailVerified(userData.isEmailVerified());
 
     return response;
   }
 
   private boolean verifyRegistrationData(User user) {
-    // verify user data
+
     String username = user.getUserName();
     String password = user.getPassword();
     String nickName = user.getNickName();
     String profileDescription = user.getProfileDescription();
     String roleName = user.getUserRole().getRoleName();
-    String email = user.getEmail();
     String firstName = user.getFirstName();
     String lastName = user.getLastName();
 
@@ -84,7 +74,6 @@ public class UserService {
         || (nickName == null || nickName.isEmpty())
         || (profileDescription == null || profileDescription.isEmpty())
         || (roleName == null || roleName.isEmpty())
-        || (email == null || email.isEmpty())
         || (firstName == null || firstName.isEmpty())
         || (lastName == null || lastName.isEmpty())) {
       return false;
@@ -95,7 +84,8 @@ public class UserService {
       return false;
     } else if (!password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{9,}$")) {
       return false;
-    } else return email.matches("^[A-Za-z0-9+_.-]+@(.+)$");
+    }
+    return true;
   }
 
   /**
@@ -110,11 +100,6 @@ public class UserService {
       return "user already exist";
     }
 
-    // check if email is exist
-    existingUser = userRepository.findByEmail(user.getEmail());
-    if (existingUser != null) {
-      return "email already exist";
-    }
     // verify user data
     boolean isValidUserRegistrationData = verifyRegistrationData(user);
     if (isValidUserRegistrationData) {
@@ -140,49 +125,6 @@ public class UserService {
   }
 
   /**
-   * Method to send email.
-   *
-   * @param from     from email
-   * @param to       to email
-   * @param passcode passcode
-   */
-  public void sendPassCodeEmail(String from, String to, int passcode) {
-    SimpleMailMessage message = new SimpleMailMessage();
-    message.setFrom(from);
-    message.setTo(to);
-    message.setSubject("Welcome to IdeaSync");
-
-    String emailContentTemplate = "歡迎來到IdeaSync,\n\n你的驗證碼為: %d\n\n此驗證碼將在5分鐘後失效\n\n請勿將此驗證碼提供給他人\n\n謝謝您的配合\n\nBest,\nIdeaSync團隊";
-    String emailContent = String.format(emailContentTemplate, passcode);
-
-    message.setText(emailContent);
-    emailSender.send(message);
-  }
-
-  /**
-   * Method to generate 6 digits random number.
-   *
-   * @param username username of user
-   * @param email    email of user
-   * @return passcode and expiration time
-   */
-  public PassCodeResponse generatePassCode(String username, String email) {
-    User user = userRepository.findByUserName(username);
-    int passcode = (int) (Math.random() * 900000) + 100000;
-
-    Timestamp passCodeCreateTime = new Timestamp(System.currentTimeMillis());
-    Timestamp passCodeExpiryTime = new Timestamp(System.currentTimeMillis() + 5 * 60 * 1000);
-
-
-    user.setPassCode(passcode);
-    user.setPassCodeCreateTime(passCodeCreateTime);
-    userRepository.save(user);
-    sendPassCodeEmail("blackseanx@gmail.com", email, passcode);
-
-    return new PassCodeResponse(passcode, passCodeExpiryTime);
-  }
-
-  /**
    * Method to delete user based on username.
    *
    * @param username username of user
@@ -190,30 +132,12 @@ public class UserService {
    */
   public String deleteUser(String username) {
     User user = userRepository.findByUserName(username);
-    // if success, delete and return success message, else return error message
+
     try {
       userRepository.delete(user);
       return "User deleted successfully";
     } catch (Exception e) {
       return "User deletion failed";
-    }
-  }
-
-
-  /**
-   * Method to mark user email as verified based on username.
-   * @param username username of user
-   * @return success message
-   */
-  public String markEmailAsVerified(String username) {
-    User user = userRepository.findByUserName(username);
-    user.setEmailVerified(true);
-    // if success, save and return success message, else return error message
-    try {
-      userRepository.save(user);
-      return "Email verified successfully";
-    } catch (Exception e) {
-      return "Email verification failed";
     }
   }
 }
