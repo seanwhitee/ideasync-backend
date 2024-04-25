@@ -1,6 +1,8 @@
 package com.ideasync.ideasyncbackend.user;
 
+import com.ideasync.ideasyncbackend.user.dto.RegisterRequest;
 import com.ideasync.ideasyncbackend.user.dto.UserResponse;
+import com.ideasync.ideasyncbackend.userrole.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -59,15 +61,15 @@ public class UserService {
     return response;
   }
 
-  private boolean verifyRegistrationData(User user) {
+  private boolean verifyRegistrationData(RegisterRequest registerRequest) {
 
-    String username = user.getUserName();
-    String password = user.getPassword();
-    String nickName = user.getNickName();
-    String profileDescription = user.getProfileDescription();
-    String roleName = user.getUserRole().getRoleName();
-    String firstName = user.getFirstName();
-    String lastName = user.getLastName();
+    String username = registerRequest.getUserName();
+    String password = registerRequest.getPassword();
+    String nickName = registerRequest.getNickName();
+    String profileDescription = registerRequest.getProfileDescription();
+    String roleName = registerRequest.getRoleName();
+    String firstName = registerRequest.getFirstName();
+    String lastName = registerRequest.getLastName();
 
     if ((username == null || username.isEmpty())
         || (password == null || password.isEmpty())
@@ -82,27 +84,39 @@ public class UserService {
     // check email, username, password pattern
     if (!username.matches("^[a-zA-Z0-9]{7,}$")) {
       return false;
-    } else if (!password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{9,}$")) {
-      return false;
-    }
-    return true;
+    } else return password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{9,}$");
   }
 
   /**
    * Method to validate user data.
    *
-   * @param user user data
+   * @param registerRequest user data
    * @return String
    */
-  public String registerUser(User user) {
-    User existingUser = userRepository.findByUserName(user.getUserName());
+  public String registerUser(RegisterRequest registerRequest) {
+    User existingUser = userRepository.findByUserName(registerRequest.getUserName());
     if (existingUser != null) {
       return "user already exist";
     }
 
     // verify user data
-    boolean isValidUserRegistrationData = verifyRegistrationData(user);
+    boolean isValidUserRegistrationData = verifyRegistrationData(registerRequest);
     if (isValidUserRegistrationData) {
+      User user = new User();
+      user.setUserName(registerRequest.getUserName());
+      user.setPassword(registerRequest.getPassword());
+      user.setNickName(registerRequest.getNickName());
+      user.setProfileDescription(registerRequest.getProfileDescription());
+      user.setAvatarUrl(registerRequest.getAvatarUrl());
+      user.setFirstName(registerRequest.getFirstName());
+      user.setLastName(registerRequest.getLastName());
+      user.setRoleVerified(registerRequest.getRoleVerified());
+      user.setAllowProjectApply(registerRequest.getAllowProjectApply());
+      user.setAllowProjectCreate(registerRequest.getAllowProjectCreate());
+      UserRole userRole = new UserRole();
+      userRole.setId(registerRequest.getRoleId());
+      userRole.setRoleName(registerRequest.getRoleName());
+      user.setUserRole(userRole);
       userRepository.save(user);
       return "user data is valid";
     }

@@ -1,5 +1,6 @@
 package com.ideasync.ideasyncbackend.user;
 
+import com.ideasync.ideasyncbackend.user.dto.RegisterRequest;
 import com.ideasync.ideasyncbackend.user.dto.UserResponse;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,8 +21,8 @@ public class UserController {
   }
 
   @PostMapping("/register")
-  public String registerUser(@RequestBody User user) {
-    return userService.registerUser(user);
+  public String registerUser(@RequestBody RegisterRequest registerRequest) {
+    return userService.registerUser(registerRequest);
   }
 
   @GetMapping("/{id}")
