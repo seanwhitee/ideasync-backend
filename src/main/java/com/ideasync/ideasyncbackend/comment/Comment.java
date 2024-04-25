@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 
 import com.ideasync.ideasyncbackend.project.Project;
 import com.ideasync.ideasyncbackend.user.User;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "comment")
@@ -12,6 +15,10 @@ public class Comment {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
+  @CreationTimestamp
+  @Column(name = "createAt", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  private Timestamp createAt;
 
   @ManyToOne
   @JoinColumn(name = "userId", nullable = false)
@@ -30,6 +37,10 @@ public class Comment {
     return id;
   }
 
+  public Timestamp getCreateAt() {
+    return createAt;
+  }
+
   public User getUser() {
     return user;
   }
@@ -44,6 +55,10 @@ public class Comment {
 
   public void setId(Long id) {
     this.id = id;
+  }
+
+  public void setCreateAt(Timestamp createAt) {
+    this.createAt = createAt;
   }
 
   public void setUser(User user) {

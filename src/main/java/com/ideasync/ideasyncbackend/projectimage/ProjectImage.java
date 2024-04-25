@@ -2,6 +2,9 @@ package com.ideasync.ideasyncbackend.projectimage;
 import com.ideasync.ideasyncbackend.project.Project;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "projectimage")
@@ -10,6 +13,10 @@ public class ProjectImage {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
+  @CreationTimestamp
+  @Column(name = "createAt", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  private Timestamp createAt;
 
   @ManyToOne
   @JoinColumn(name = "projectId", nullable = false)
@@ -24,6 +31,10 @@ public class ProjectImage {
     return id;
   }
 
+  public Timestamp getCreateAt() {
+    return createAt;
+  }
+
   public Project getProject() {
     return project;
   }
@@ -34,6 +45,10 @@ public class ProjectImage {
 
   public void setId(Long id) {
     this.id = id;
+  }
+
+  public void setCreateAt(Timestamp createAt) {
+    this.createAt = createAt;
   }
 
   public void setProject(Project project) {

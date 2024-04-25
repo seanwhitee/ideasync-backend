@@ -6,7 +6,9 @@ import com.ideasync.ideasyncbackend.project.Project;
 import com.ideasync.ideasyncbackend.userrole.UserRole;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Entity
@@ -19,6 +21,10 @@ public class User {
 
   @Column(name = "userName", nullable = false, unique = true)
   private String userName;
+
+  @CreationTimestamp
+  @Column(name = "createAt", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  private Timestamp createAt;
 
   @Column(nullable = false)
   private String password;
@@ -42,13 +48,10 @@ public class User {
   @Column(name = "roleVerified", nullable = false)
   private boolean roleVerified;
 
-  @Column(name = "email", nullable = false)
+  @Column(name = "email", unique = true)
   private String email;
 
-  @Column(name = "emailVerified", nullable = false)
-  private boolean emailVerified;
-
-  @Column(name = "avatarUrl", nullable =  false)
+  @Column(name = "avatarUrl", nullable = false)
   private String avatarUrl;
 
   @Column(name = "firstName", nullable = false)
@@ -107,10 +110,6 @@ public class User {
 
   public String getEmail() {
     return email;
-  }
-
-  public boolean isEmailVerified() {
-    return emailVerified;
   }
 
   public String getAvatarUrl() {
@@ -177,10 +176,6 @@ public class User {
     this.email = email;
   }
 
-  public void setEmailVerified(boolean emailVerified) {
-    this.emailVerified = emailVerified;
-  }
-
   public void setAvatarUrl(String avatarUrl) {
     this.avatarUrl = avatarUrl;
   }
@@ -204,4 +199,13 @@ public class User {
   public void setApplicants(List<Applicant> applicants) {
     this.applicants = applicants;
   }
+
+  public Timestamp getCreateAt() {
+    return createAt;
+  }
+
+  public void setCreateAt(Timestamp createAt) {
+    this.createAt = createAt;
+  }
+
 }

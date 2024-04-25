@@ -6,7 +6,9 @@ import com.ideasync.ideasyncbackend.projectstatus.ProjectStatus;
 import com.ideasync.ideasyncbackend.tag.Tag;
 import com.ideasync.ideasyncbackend.user.User;
 import jakarta.persistence.*;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 @Entity
@@ -16,6 +18,10 @@ public class Project {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
+
+  @CreationTimestamp
+  @Column(name = "createAt", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  private Timestamp createAt;
 
   @ManyToOne
   @JoinColumn(name = "hostUserId", nullable = false)
@@ -55,6 +61,10 @@ public class Project {
 
   public Long getId() {
     return id;
+  }
+
+  public Timestamp getCreateAt() {
+    return createAt;
   }
 
   public User getUser() {
@@ -103,6 +113,10 @@ public class Project {
 
   public void setId(Long id) {
     this.id = id;
+  }
+
+  public void setCreateAt(Timestamp createAt) {
+    this.createAt = createAt;
   }
 
   public void setUser(User user) {
