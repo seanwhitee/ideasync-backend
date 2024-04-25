@@ -28,8 +28,8 @@ public class UserService {
   public UserResponse userLogin(String username, String password) {
     User userData = userRepository.findByUserName(username);
 
-    // check if user exist
-    if (userData == null) {
+    // check if user exist, and user role is verified
+    if (userData == null || !userData.isRoleVerified()) {
       return null;
     }
 
