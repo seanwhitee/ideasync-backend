@@ -55,7 +55,7 @@ public class User {
   @Column(name = "roleVerified", nullable = false)
   private boolean roleVerified;
 
-  @Column(name = "email", nullable = false)
+  @Column(name = "email", nullable = false, unique = true)
   private String email;
 
   @Column(name = "emailVerified", nullable = false)

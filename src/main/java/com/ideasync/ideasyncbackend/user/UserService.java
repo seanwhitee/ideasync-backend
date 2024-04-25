@@ -110,6 +110,11 @@ public class UserService {
       return "user already exist";
     }
 
+    // check if email is exist
+    existingUser = userRepository.findByEmail(user.getEmail());
+    if (existingUser != null) {
+      return "email already exist";
+    }
     // verify user data
     boolean isValidUserRegistrationData = verifyRegistrationData(user);
     if (isValidUserRegistrationData) {
