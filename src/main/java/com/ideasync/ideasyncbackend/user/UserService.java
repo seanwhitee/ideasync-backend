@@ -1,10 +1,11 @@
 package com.ideasync.ideasyncbackend.user;
 
-import com.ideasync.ideasyncbackend.user.dto.RegisterRequest;
+
 import com.ideasync.ideasyncbackend.user.dto.UserResponse;
-import com.ideasync.ideasyncbackend.userrole.UserRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 
 
 /**
@@ -14,10 +15,12 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
   private final UserRepository userRepository;
+  private final JavaMailSender emailSender;
 
   @Autowired
-  public UserService(UserRepository userRepository) {
+  public UserService(UserRepository userRepository, JavaMailSender emailSender) {
     this.userRepository = userRepository;
+    this.emailSender = emailSender;
   }
 
   /**
@@ -61,17 +64,19 @@ public class UserService {
     return response;
   }
 
-  private boolean verifyRegistrationData(RegisterRequest registerRequest) {
+  private boolean verifyRegistrationData(User user) {
 
-    String username = registerRequest.getUserName();
-    String password = registerRequest.getPassword();
-    String nickName = registerRequest.getNickName();
-    String profileDescription = registerRequest.getProfileDescription();
-    String roleName = registerRequest.getRoleName();
-    String firstName = registerRequest.getFirstName();
-    String lastName = registerRequest.getLastName();
+    String username = user.getUserName();
+    String password = user.getPassword();
+    String nickName = user.getNickName();
+    String profileDescription = user.getProfileDescription();
+    String roleName = user.getUserRole().getRoleName();
+    String firstName = user.getFirstName();
+    String lastName = user.getLastName();
+    String email = user.getEmail();
 
-    if ((username == null || username.isEmpty())
+    if ((email == null || email.isEmpty())
+        || (username == null || username.isEmpty())
         || (password == null || password.isEmpty())
         || (nickName == null || nickName.isEmpty())
         || (profileDescription == null || profileDescription.isEmpty())
@@ -82,47 +87,74 @@ public class UserService {
     }
 
     // check email, username, password pattern
-    if (!username.matches("^[a-zA-Z0-9]{7,}$")) {
+    if (!email.matches("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$")) {
+      return false;
+    } else if (!username.matches("^[a-zA-Z0-9]{7,}$")) {
       return false;
     } else return password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{9,}$");
+  }
+
+
+  /**
+   * Method to save user data.
+   *
+   * @param user user data
+   * @return String
+   */
+  public String saveUserData(User user) {
+    try {
+      userRepository.save(user);
+    } catch (Exception e) {
+      return "User data saving failed";
+    }
+    return "User data saved successfully";
   }
 
   /**
    * Method to validate user data.
    *
-   * @param registerRequest user data
+   * @param user user data
    * @return String
    */
-  public String registerUser(RegisterRequest registerRequest) {
-    User existingUser = userRepository.findByUserName(registerRequest.getUserName());
+  public String registerUser(User user) {
+    User existingUser = userRepository.findByUserName(user.getUserName());
     if (existingUser != null) {
       return "user already exist";
     }
 
+    // check email is not already registered
+    existingUser = userRepository.findByEmail(user.getEmail());
+    if (existingUser != null) {
+      return "email already registered";
+    }
     // verify user data
-    boolean isValidUserRegistrationData = verifyRegistrationData(registerRequest);
+    boolean isValidUserRegistrationData = verifyRegistrationData(user);
     if (isValidUserRegistrationData) {
-      User user = new User();
-      user.setUserName(registerRequest.getUserName());
-      user.setPassword(registerRequest.getPassword());
-      user.setNickName(registerRequest.getNickName());
-      user.setProfileDescription(registerRequest.getProfileDescription());
-      user.setAvatarUrl(registerRequest.getAvatarUrl());
-      user.setFirstName(registerRequest.getFirstName());
-      user.setLastName(registerRequest.getLastName());
-      user.setRoleVerified(registerRequest.getRoleVerified());
-      user.setAllowProjectApply(registerRequest.getAllowProjectApply());
-      user.setAllowProjectCreate(registerRequest.getAllowProjectCreate());
-      UserRole userRole = new UserRole();
-      userRole.setId(registerRequest.getRoleId());
-      userRole.setRoleName(registerRequest.getRoleName());
-      user.setUserRole(userRole);
-      userRepository.save(user);
       return "user data is valid";
     }
     return "user registration failed, data is not valid";
   }
 
+
+  public String sendPassCodeEmail(String from, String to, int passcode) {
+    SimpleMailMessage message = new SimpleMailMessage();
+    message.setFrom(from);
+    message.setTo(to);
+    message.setSubject("Welcome to IdeaSync");
+
+    String emailContentTemplate = "歡迎來到IdeaSync,\n\n你的驗證碼為: %d\n\n此驗證碼將在5分鐘後失效\n\n" +
+        "請勿將此驗證碼提供給他人\n\n謝謝您的配合\n\n\nIdeaSync團隊";
+    String emailContent = String.format(emailContentTemplate, passcode);
+
+    message.setText(emailContent);
+    try {
+      emailSender.send(message);
+    } catch (Exception e) {
+      return "Email sending failed";
+    }
+    return "Email sent successfully";
+
+  }
 
   /**
    * Method to get user by id.

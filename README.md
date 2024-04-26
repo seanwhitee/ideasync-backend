@@ -14,5 +14,7 @@ This is a backend application for the Idea Sync project.
     DB_NAME=
     DB_USERNAME=
     DB_PASSWORD=
+    COMPANY_EMAIL=
+    COMPANY_EMAIL_PASSWORD=
     ```
 3. Load the gradle dependencies, and you are good to go.

@@ -12,7 +12,6 @@ public class UserResponse {
   private boolean allowProjectApply;
   private boolean allowProjectCreate;
   private boolean roleVerified;
-  private boolean emailVerified;
 
   // Getters and setters
 
@@ -60,10 +59,6 @@ public class UserResponse {
     return roleVerified;
   }
 
-  public boolean isEmailVerified() {
-    return emailVerified;
-  }
-
   public void setId(Long id) {
     this.id = id;
   }
@@ -106,9 +101,5 @@ public class UserResponse {
 
   public void setRoleVerified(boolean roleVerified) {
     this.roleVerified = roleVerified;
-  }
-
-  public void setEmailVerified(boolean emailVerified) {
-    this.emailVerified = emailVerified;
   }
 }
