@@ -1,6 +1,6 @@
 package com.ideasync.ideasyncbackend.project;
 
-import com.ideasync.ideasyncbackend.project.dto.ProjectResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -59,7 +59,7 @@ public class ProjectService {
      */
     public String CreateProject(Project project){
         Boolean allowProjectCreate = project.getUser().isAllowProjectCreate();
-        if(allowProjectCreate){
+        if(!allowProjectCreate){
             return "You already join project";
         }
 
