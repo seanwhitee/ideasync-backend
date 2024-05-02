@@ -119,6 +119,13 @@ public class ProjectService {
           projectImageRepository.save(newImage);
         }
       }
+
+      // After successfully saving the project
+      // modify user allowProjectCreate to false
+      // modify user allowProjectApply to false
+      user.get().setAllowProjectCreate(false);
+      user.get().setAllowProjectApply(false);
+      userRepository.save(user.get());
       return "Project created successfully";
     } catch (Exception e) {
       return "Project created failed";
