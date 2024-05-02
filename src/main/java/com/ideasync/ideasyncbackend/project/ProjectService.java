@@ -1,68 +1,128 @@
 package com.ideasync.ideasyncbackend.project;
 
 
+import com.ideasync.ideasyncbackend.project.dto.ProjectRequest;
+import com.ideasync.ideasyncbackend.projectimage.ProjectImage;
+import com.ideasync.ideasyncbackend.projectimage.ProjectImageRepository;
+import com.ideasync.ideasyncbackend.projectstatus.ProjectStatus;
+import com.ideasync.ideasyncbackend.tag.Tag;
+import com.ideasync.ideasyncbackend.tag.TagRepository;
+import com.ideasync.ideasyncbackend.user.User;
+import com.ideasync.ideasyncbackend.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.print.DocFlavor;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProjectService {
-    private final ProjectRepository projectRepository;
+  private final ProjectRepository projectRepository;
+  private final UserRepository userRepository;
+  private final TagRepository tagRepository;
+  private final ProjectImageRepository projectImageRepository;
 
-    @Autowired
-    public ProjectService(ProjectRepository projectRepository) {
-        this.projectRepository = projectRepository;
+  @Autowired
+  public ProjectService(ProjectRepository projectRepository, UserRepository userRepository, TagRepository tagRepository, ProjectImageRepository projectImageRepository) {
+    this.projectRepository = projectRepository;
+    this.userRepository = userRepository;
+    this.tagRepository = tagRepository;
+    this.projectImageRepository = projectImageRepository;
+  }
+
+  public boolean isValidProjectData(ProjectRequest projectRequest) {
+    String title = projectRequest.getTitle();
+    String description = projectRequest.getDescription();
+    Long statusId = projectRequest.getStatusId();
+    String school = projectRequest.getSchool();
+    int allowApplicantsNum = projectRequest.getAllowApplicantsNum();
+    int applicantCount = projectRequest.getApplicantCount();
+
+    if ((title == null || title.isEmpty())
+        || (description == null || description.isEmpty())
+        || (statusId == null)
+        || (school == null || school.isEmpty())
+        || (allowApplicantsNum == 0)
+        || (applicantCount > 0)
+    ) {
+      return false;
     }
 
-    private ProjectResponse getProjectResponse(Project projectData){
-        ProjectResponse response = new ProjectResponse();
-        response.setId(projectData.getId());
-        response.setAllowApplicantsNum(projectData.getAllowApplicantsNum());
-        response.setCreateAt(projectData.getCreateAt());
-        response.setDescription(projectData.getDescription());
-        response.setIsGraduationProject(projectData.isGraduationProject());
-        response.setSchool(projectData.getSchool());
-        response.setStatusId(projectData.getProjectStatus().getId());
-        response.setHostUserId(projectData.getUser().getId());
 
-        return response;
+    // if all data is valid
+    // and the user is allowed to create project
+    // and the user did not create the project with the same title
+    return true;
+  }
+
+  public boolean checkProjectWithoutSameTitle(User user, String title) {
+    List<Project> projects = projectRepository.findProjectsByUser(user);
+    for (Project project : projects) {
+      if (project.getTitle().equals(title)) {
+        return false;
+      }
     }
-    /**
-     * 要確定該填的資料都有填
-     * (但我不太確定有沒有漏)
-     *
-     */
-    private boolean verifyProjectData(Project project){
-        String description = project.getDescription();
-        String school = project.getSchool();
-        Long hostUserId = project.getUser().getId();
+    return true;
+  }
 
-        if(description == null || school == null){
-            return false;
+  public String createProject(ProjectRequest projectRequest) {
+    // get user who intends to create the project
+    Optional<User> user = userRepository.findById(projectRequest.getHostId());
+    Project project = new Project();
+
+
+    // check user is allowed to create project
+    if (user.isPresent()) {
+      if (!user.get().isAllowProjectCreate()) {
+        return "User is not allowed to create project";
+      } else if (!isValidProjectData(projectRequest)) {
+        return "Invalid project data";
+      } else if (!checkProjectWithoutSameTitle(user.get(), projectRequest.getTitle())) {
+        return "Project with the same title already exists";
+      }
+    } else {
+      return "User not found";
+    }
+
+    ProjectStatus projectStatus = new ProjectStatus();
+    projectStatus.setId(projectRequest.getStatusId());
+
+    // set project data
+    project.setUser(user.get());
+    project.setTitle(projectRequest.getTitle());
+    project.setDescription(projectRequest.getDescription());
+    project.setProjectStatus(projectStatus);
+    project.setGraduationProject(projectRequest.getGraduationProject());
+    project.setSchool(projectRequest.getSchool());
+    project.setAllowApplicantsNum(projectRequest.getAllowApplicantsNum());
+    project.setApplicantCount(projectRequest.getApplicantCount());
+
+    try {
+      projectRepository.save(project);
+
+      // save project tags and images to the database
+      List<String> tags = projectRequest.getTags();
+      List<String> images = projectRequest.getProjectImages();
+      if (tags != null && !tags.isEmpty()) {
+        for (String tag : tags) {
+          Tag newTag = new Tag();
+          newTag.setName(tag);
+          newTag.setProject(project);
+          tagRepository.save(newTag);
         }
-        return true;
-    }
-
-    public String saveProjectData(Project project) {
-        try {
-            ProjectRepository.save(project);
-        } catch (Exception e) {
-            return "Project created successfully";
+      }
+      if (images != null && !images.isEmpty()) {
+        for (String image : projectRequest.getProjectImages()) {
+          ProjectImage newImage = new ProjectImage();
+          newImage.setImageUrl(image);
+          newImage.setProject(project);
+          projectImageRepository.save(newImage);
         }
-        return "Project created failed";
+      }
+      return "Project created successfully";
+    } catch (Exception e) {
+      return "Project created failed";
     }
-    /**
-     * 要確定這個使用者是不是參加別的團隊了
-     * (但我不知道怎麼確認這個使用者)
-     *
-     */
-    public String CreateProject(Project project){
-        Boolean allowProjectCreate = project.getUser().isAllowProjectCreate();
-        if(!allowProjectCreate){
-            return "You already join project";
-        }
-
-    }
-
+//    return "Project created successfully";
+  }
 }

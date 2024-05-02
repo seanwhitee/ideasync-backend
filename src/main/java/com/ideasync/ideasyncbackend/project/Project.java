@@ -19,13 +19,12 @@ public class Project {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @CreationTimestamp
-  @Column(name = "createAt", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-  private Timestamp createAt;
-
   @ManyToOne
   @JoinColumn(name = "hostUserId", nullable = false)
   private User user;
+
+  @Column(name = "title", nullable = false)
+  private String title;
 
   @Column(nullable = false)
   private String description;
@@ -46,6 +45,10 @@ public class Project {
   @Column(name = "applicantCount", nullable = false)
   private int applicantCount;
 
+  @CreationTimestamp
+  @Column(name = "createAt", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  private Timestamp createAt;
+
   @OneToMany(mappedBy = "project")
   private List<ProjectImage> projectImages;
 
@@ -58,6 +61,15 @@ public class Project {
   @OneToMany(mappedBy = "project")
   private List<Applicant> applicants;
   // Constructors, getters, and setters
+
+
+  public String getTitle() {
+    return title;
+  }
+
+  public void setTitle(String title) {
+    this.title = title;
+  }
 
   public Long getId() {
     return id;
