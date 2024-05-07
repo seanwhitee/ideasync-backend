@@ -3,6 +3,7 @@ package com.ideasync.ideasyncbackend.user;
 import com.ideasync.ideasyncbackend.user.dto.UserResponse;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @CrossOrigin
@@ -44,5 +45,15 @@ public class UserController {
   @GetMapping("/login")
   public UserResponse userLogin(@RequestParam String username, @RequestParam String password) {
     return userService.userLogin(username, password);
+  }
+
+  @PatchMapping("/updateRoleStatus")
+  public String updateRoleStatus(@RequestParam Long id, @RequestParam boolean status) {
+    return userService.updateRoleStatus(id, status);
+  }
+
+  @GetMapping("/getAllUsers")
+  public List<UserResponse> getAllUsers() {
+    return userService.getAllUsers();
   }
 }

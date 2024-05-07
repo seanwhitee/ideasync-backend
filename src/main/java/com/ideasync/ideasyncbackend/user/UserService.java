@@ -7,6 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 
 /**
  * Service class for user operations.
@@ -185,5 +189,24 @@ public class UserService {
     } catch (Exception e) {
       return "User deletion failed";
     }
+  }
+
+  public String updateRoleStatus(Long id, boolean status) {
+    Optional<User> user = userRepository.findById(id);
+    if (user.isPresent()) {
+      user.get().setRoleVerified(status);
+      userRepository.save(user.get());
+      return "Role status updated successfully";
+    }
+    return "User not found";
+  }
+
+  public List<UserResponse> getAllUsers() {
+    List<User> users = userRepository.findAll();
+    List<UserResponse> userResponses = new ArrayList<>();
+    for (User user : users) {
+      userResponses.add(getUserResponse(user));
+    }
+    return userResponses;
   }
 }
