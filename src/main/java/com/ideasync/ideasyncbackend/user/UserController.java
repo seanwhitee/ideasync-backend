@@ -23,8 +23,8 @@ public class UserController {
     return userService.sendPassCodeEmail(env.get("COMPANY_EMAIL"), email, passCode);
   }
   @DeleteMapping("/deleteUser")
-  public String deleteUser(@RequestParam String username) {
-    return userService.deleteUser(username);
+  public String deleteUser(@RequestParam Long id) {
+    return userService.deleteUser(id);
   }
 
   @PostMapping("/register")

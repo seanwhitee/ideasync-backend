@@ -177,18 +177,21 @@ public class UserService {
   /**
    * Method to delete user based on username.
    *
-   * @param username username of user
+   * @param id id of user
    * @return success message
    */
-  public String deleteUser(String username) {
-    User user = userRepository.findByUserName(username);
+  public String deleteUser(Long id) {
+    Optional<User> user = userRepository.findById(id);
 
-    try {
-      userRepository.delete(user);
-      return "User deleted successfully";
-    } catch (Exception e) {
-      return "User deletion failed";
+    if (user.isPresent()) {
+      try {
+        userRepository.delete(user.get());
+        return "User deleted successfully";
+      } catch (Exception e) {
+        return "User deletion failed";
+      }
     }
+    return "User not found";
   }
 
   public String updateRoleStatus(Long id, boolean status) {
