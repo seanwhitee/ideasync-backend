@@ -17,7 +17,7 @@ public class ProjectStatus {
   @Column(name = "status", nullable = false)
   private String status;
 
-  @OneToMany(mappedBy = "projectStatus")
+  @OneToMany(mappedBy = "projectStatus", cascade = {CascadeType.MERGE})
   private List<Project> projects;
   // Constructors, getters, and setters
 

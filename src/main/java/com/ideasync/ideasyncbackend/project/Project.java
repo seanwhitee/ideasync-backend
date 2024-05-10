@@ -49,16 +49,16 @@ public class Project {
   @Column(name = "createAt", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
   private Timestamp createAt;
 
-  @OneToMany(mappedBy = "project")
+  @OneToMany(mappedBy = "project", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
   private List<ProjectImage> projectImages;
 
-  @OneToMany(mappedBy = "project")
+  @OneToMany(mappedBy = "project", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
   private List<Tag> tags;
 
-  @OneToMany(mappedBy = "project")
+  @OneToMany(mappedBy = "project", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
   private List<Comment> comments;
 
-  @OneToMany(mappedBy = "project")
+  @OneToMany(mappedBy = "project", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
   private List<Applicant> applicants;
   // Constructors, getters, and setters
 

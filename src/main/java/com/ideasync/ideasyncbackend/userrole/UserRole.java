@@ -13,7 +13,7 @@ public class UserRole {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @OneToMany(mappedBy = "userRole")
+  @OneToMany(mappedBy = "userRole", cascade = {CascadeType.MERGE})
   private List<User> users;
 
   @Column(name = "roleName", nullable = false)
