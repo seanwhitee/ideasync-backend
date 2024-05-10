@@ -7,6 +7,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 
 /**
  * Service class for user operations.
@@ -173,17 +177,39 @@ public class UserService {
   /**
    * Method to delete user based on username.
    *
-   * @param username username of user
+   * @param id id of user
    * @return success message
    */
-  public String deleteUser(String username) {
-    User user = userRepository.findByUserName(username);
+  public String deleteUser(Long id) {
+    Optional<User> user = userRepository.findById(id);
 
-    try {
-      userRepository.delete(user);
-      return "User deleted successfully";
-    } catch (Exception e) {
-      return "User deletion failed";
+    if (user.isPresent()) {
+      try {
+        userRepository.delete(user.get());
+        return "User deleted successfully";
+      } catch (Exception e) {
+        return "User deletion failed";
+      }
     }
+    return "User not found";
+  }
+
+  public String updateRoleStatus(Long id, boolean status) {
+    Optional<User> user = userRepository.findById(id);
+    if (user.isPresent()) {
+      user.get().setRoleVerified(status);
+      userRepository.save(user.get());
+      return "Role status updated successfully";
+    }
+    return "User not found";
+  }
+
+  public List<UserResponse> getAllUsers() {
+    List<User> users = userRepository.findAll();
+    List<UserResponse> userResponses = new ArrayList<>();
+    for (User user : users) {
+      userResponses.add(getUserResponse(user));
+    }
+    return userResponses;
   }
 }

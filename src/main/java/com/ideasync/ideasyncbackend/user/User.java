@@ -60,7 +60,7 @@ public class User {
   @Column(name = "lastName", nullable = false)
   private String lastName;
 
-  @OneToMany(mappedBy = "user")
+  @OneToMany(mappedBy = "user", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
   private List<Project> projects;
 
   @OneToMany(mappedBy = "user")
