@@ -20,7 +20,10 @@ public class ProjectStatusController {
         this.projectStatusService = projectStatusService;
     }
 
-    @GetMapping("/getProjectStatus")
-    public List<ProjectStatusResponse> getProjectStatus(){return projectStatusService.getProjectStatus(projectStatusResponse.getId());}
+    @GetMapping("/getProjectStatusForTeachers")
+    public List<ProjectStatusResponse> getProjectStatusForTeachers(){return projectStatusService.getProjectStatusForTeachers();}
+
+    @GetMapping("/getProjectStatusForMembers")
+    public List<ProjectStatusResponse> getProjectStatusForMembers(){return projectStatusService.getProjectStatusForMembers();}
 
 }

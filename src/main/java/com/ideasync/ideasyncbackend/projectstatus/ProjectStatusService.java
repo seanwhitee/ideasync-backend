@@ -25,32 +25,29 @@ public class ProjectStatusService {
 
     }
     private ProjectStatusResponse getProjectStatusResponse(ProjectStatus projectStatusData) {
-
         ProjectStatusResponse response = new ProjectStatusResponse();
         response.setId(projectStatusData.getId());
         response.setStatus(projectStatusData.getStatus());
         response.setProjects(projectStatusData.getProjects());
-
         return response;
     }
 
+    public List<ProjectStatusResponse> getProjectStatusForMembers() {
+        return getProjectStatus(1);
+    }
 
-    public List<ProjectStatusResponse> getProjectStatus(long id){
+    public List<ProjectStatusResponse> getProjectStatusForTeachers() {
+        return getProjectStatus(2);
+    }
+
+    public List<ProjectStatusResponse> getProjectStatus(long id) {
         List<ProjectStatus> projects = projectStatusRepository.findAll();
-        List<ProjectStatusResponse> projectStatusResponses_findMember = new ArrayList<>();
-        List<ProjectStatusResponse> projectStatusResponses_findTeacher = new ArrayList<>();
-        for(ProjectStatus projectStatus : projects){
-            //ProjectStatus status = projectStatusRepository.findStatusById(id);
-            if(projectStatus.getId()==1){
-               projectStatusResponses_findMember.add(getProjectStatusResponse(projectStatus));
-               return projectStatusResponses_findMember;
-
-            } else if (projectStatus.getId()==2) {
-                projectStatusResponses_findTeacher.add(getProjectStatusResponse(projectStatus));
-                return projectStatusResponses_findTeacher;
-
+        List<ProjectStatusResponse> projectStatusResponses = new ArrayList<>();
+        for (ProjectStatus projectStatus : projects) {
+            if (projectStatus.getId() == id) {
+                projectStatusResponses.add(getProjectStatusResponse(projectStatus));
             }
         }
-        return null;
+        return projectStatusResponses;
     }
 }
