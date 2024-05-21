@@ -1,34 +1,40 @@
 package com.ideasync.ideasyncbackend.projectstatus;
 
+import com.ideasync.ideasyncbackend.project.ProjectService;
+import com.ideasync.ideasyncbackend.project.dto.ProjectResponse;
 import com.ideasync.ideasyncbackend.projectstatus.dto.ProjectStatusResponse;
-import com.ideasync.ideasyncbackend.user.User;
-import com.ideasync.ideasyncbackend.user.dto.UserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ideasync.ideasyncbackend.project.Project;
 import com.ideasync.ideasyncbackend.project.ProjectRepository;
-import com.ideasync.ideasyncbackend.projectstatus.dto.ProjectStatusResponse;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProjectStatusService {
     private final ProjectStatusRepository projectStatusRepository;
-    private final ProjectRepository projectRepository;
+    private final ProjectService projectService;
 
     @Autowired
-    public ProjectStatusService(ProjectStatusRepository projectStatusRepository, ProjectRepository projectRepository){
+    public ProjectStatusService(ProjectStatusRepository projectStatusRepository, ProjectRepository projectRepository, ProjectService projectService){
         this.projectStatusRepository = projectStatusRepository;
-        this.projectRepository = projectRepository;
-
+        this.projectService = projectService;
     }
     private ProjectStatusResponse getProjectStatusResponse(ProjectStatus projectStatusData) {
         ProjectStatusResponse response = new ProjectStatusResponse();
+
         response.setId(projectStatusData.getId());
         response.setStatus(projectStatusData.getStatus());
-        response.setProjects(projectStatusData.getProjects());
+
+        List<ProjectResponse> projectResponses = new ArrayList<>();
+        for (Project project : projectStatusData.getProjects()) {
+            ProjectResponse projectResponse = projectService.setProjectResponse(project);
+            projectResponses.add(projectResponse);
+        }
+
+        response.setProjects(projectResponses);
+
         return response;
     }
 

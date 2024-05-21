@@ -2,6 +2,7 @@ package com.ideasync.ideasyncbackend.project;
 
 
 import com.ideasync.ideasyncbackend.project.dto.ProjectRequest;
+import com.ideasync.ideasyncbackend.project.dto.ProjectResponse;
 import com.ideasync.ideasyncbackend.projectimage.ProjectImage;
 import com.ideasync.ideasyncbackend.projectimage.ProjectImageRepository;
 import com.ideasync.ideasyncbackend.projectstatus.ProjectStatus;
@@ -38,21 +39,18 @@ public class ProjectService {
     int allowApplicantsNum = projectRequest.getAllowApplicantsNum();
     int applicantCount = projectRequest.getApplicantCount();
 
-    if ((title == null || title.isEmpty())
-        || (description == null || description.isEmpty())
-        || (statusId == null)
-        || (school == null || school.isEmpty())
-        || (allowApplicantsNum == 0)
-        || (applicantCount > 0)
-    ) {
-      return false;
-    }
-
-
     // if all data is valid
     // and the user is allowed to create project
     // and the user did not create the project with the same title
-    return true;
+    return (title != null && !title.isEmpty())
+            && (description != null && !description.isEmpty())
+            && (statusId != null)
+            && (school != null && !school.isEmpty())
+            && (allowApplicantsNum != 0)
+            && (applicantCount <= 0);
+
+
+
   }
 
   public boolean checkProjectWithoutSameTitle(User user, String title) {
@@ -65,6 +63,21 @@ public class ProjectService {
     return true;
   }
 
+  public ProjectResponse setProjectResponse(Project project) {
+    return new ProjectResponse(
+            project.getId(),
+            project.getUser().getId(),
+            project.getProjectStatus().getId(),
+            project.getTitle(),
+            project.getDescription(),
+            project.getSchool(),
+            project.getAllowApplicantsNum(),
+            project.getApplicantCount(),
+            project.isGraduationProject(),
+            project.getCreateAt()
+    );
+
+  }
   public String createProject(ProjectRequest projectRequest) {
     // get user who intends to create the project
     Optional<User> user = userRepository.findById(projectRequest.getHostId());
@@ -130,6 +143,5 @@ public class ProjectService {
     } catch (Exception e) {
       return "Project created failed";
     }
-//    return "Project created successfully";
   }
 }

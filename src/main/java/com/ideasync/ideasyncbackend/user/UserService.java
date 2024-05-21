@@ -95,7 +95,7 @@ public class UserService {
       return false;
     } else if (!username.matches("^[a-zA-Z0-9]{7,}$")) {
       return false;
-    } else return password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{9,}$");
+    } else return password.matches("^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{9,}$");
   }
 
 
@@ -146,8 +146,15 @@ public class UserService {
     message.setTo(to);
     message.setSubject("Welcome to IdeaSync");
 
-    String emailContentTemplate = "歡迎來到IdeaSync,\n\n你的驗證碼為: %d\n\n此驗證碼將在5分鐘後失效\n\n" +
-        "請勿將此驗證碼提供給他人\n\n謝謝您的配合\n\n\nIdeaSync團隊";
+    String emailContentTemplate = """
+            歡迎來到IdeaSync,你的驗證碼為: %d
+            
+            此驗證碼將在5分鐘後失效請勿將此驗證碼提供給他人
+            
+            謝謝您的配合
+            
+            IdeaSync團隊
+            """;
     String emailContent = String.format(emailContentTemplate, passcode);
 
     message.setText(emailContent);
@@ -191,7 +198,7 @@ public class UserService {
         return "User deletion failed";
       }
     }
-    return "Use                                 r not found";
+    return "User not found";
   }
 
   public String updateRoleStatus(Long id, boolean status) {
