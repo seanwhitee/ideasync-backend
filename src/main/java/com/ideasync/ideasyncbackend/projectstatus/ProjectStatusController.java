@@ -6,15 +6,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
-import java.util.Map;
+
 @CrossOrigin
 @RestController
 @RequestMapping(path = "api/v1/projectStatus")
 public class ProjectStatusController {
     private final ProjectStatusService projectStatusService;
-
-    Map<String, String> env = System.getenv();
-    ProjectStatusResponse projectStatusResponse = new ProjectStatusResponse();
 
     public ProjectStatusController(ProjectStatusService projectStatusService){
         this.projectStatusService = projectStatusService;

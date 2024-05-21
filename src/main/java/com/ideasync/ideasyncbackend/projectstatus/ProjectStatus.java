@@ -2,7 +2,6 @@ package com.ideasync.ideasyncbackend.projectstatus;
 
 import com.ideasync.ideasyncbackend.project.Project;
 import jakarta.persistence.*;
-import org.apache.juli.logging.Log;
 
 import java.util.List;
 
