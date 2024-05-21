@@ -13,6 +13,7 @@ import com.ideasync.ideasyncbackend.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,6 +65,21 @@ public class ProjectService {
   }
 
   public ProjectResponse setProjectResponse(Project project) {
+
+    // get list of string contain the image URLs
+    List<ProjectImage> projectImages = projectImageRepository.findProjectImagesByProject(project);
+    List<String> images = new ArrayList<>();
+    for (ProjectImage projectImage : projectImages) {
+      images.add(projectImage.getImageUrl());
+    }
+
+    // get list of string contain the tags
+    List<Tag> tags = tagRepository.findTagsByProject(project);
+    List<String> tagNames = new ArrayList<>();
+    for (Tag tag : tags) {
+      tagNames.add(tag.getName());
+    }
+
     return new ProjectResponse(
             project.getId(),
             project.getUser().getId(),
@@ -74,7 +90,10 @@ public class ProjectService {
             project.getAllowApplicantsNum(),
             project.getApplicantCount(),
             project.isGraduationProject(),
-            project.getCreateAt()
+            project.getCreateAt(),
+            images,
+            tagNames
+
     );
 
   }
@@ -133,11 +152,7 @@ public class ProjectService {
         }
       }
 
-      // After successfully saving the project
-      // modify user allowProjectCreate to false
-      // modify user allowProjectApply to false
-      user.get().setAllowProjectCreate(false);
-      user.get().setAllowProjectApply(false);
+
       userRepository.save(user.get());
       return "Project created successfully";
     } catch (Exception e) {

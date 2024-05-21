@@ -2,6 +2,7 @@ package com.ideasync.ideasyncbackend.projectstatus;
 
 import com.ideasync.ideasyncbackend.project.ProjectService;
 import com.ideasync.ideasyncbackend.project.dto.ProjectResponse;
+import com.ideasync.ideasyncbackend.projectimage.ProjectImageRepository;
 import com.ideasync.ideasyncbackend.projectstatus.dto.ProjectStatusResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,11 +16,16 @@ import java.util.List;
 public class ProjectStatusService {
     private final ProjectStatusRepository projectStatusRepository;
     private final ProjectService projectService;
+    private final ProjectImageRepository projectImageRepository;
 
     @Autowired
-    public ProjectStatusService(ProjectStatusRepository projectStatusRepository, ProjectRepository projectRepository, ProjectService projectService){
+    public ProjectStatusService(ProjectStatusRepository projectStatusRepository,
+                                ProjectRepository projectRepository,
+                                ProjectService projectService,
+                                ProjectImageRepository projectImageRepository){
         this.projectStatusRepository = projectStatusRepository;
         this.projectService = projectService;
+        this.projectImageRepository = projectImageRepository;
     }
     private ProjectStatusResponse getProjectStatusResponse(ProjectStatus projectStatusData) {
         ProjectStatusResponse response = new ProjectStatusResponse();

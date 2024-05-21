@@ -1,6 +1,7 @@
 package com.ideasync.ideasyncbackend.project.dto;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 public class ProjectResponse {
     private Long id;
@@ -13,6 +14,8 @@ public class ProjectResponse {
     private int applicantCount;
     private boolean isGraduationProject;
     private Timestamp createAt;
+    private List<String> images;
+    private List<String> tags;
 
     public ProjectResponse(Long id,
                            Long hostUserId,
@@ -23,7 +26,9 @@ public class ProjectResponse {
                            int allowApplicantsNum,
                            int applicantCount,
                            boolean isGraduationProject,
-                           Timestamp createAt) {
+                           Timestamp createAt,
+                           List<String> images,
+                           List<String> tags) {
         this.id = id;
         this.hostUserId = hostUserId;
         this.statusId = statusId;
@@ -34,6 +39,8 @@ public class ProjectResponse {
         this.applicantCount = applicantCount;
         this.isGraduationProject = isGraduationProject;
         this.createAt = createAt;
+        this.images = images;
+        this.tags = tags;
     }
 
     public Timestamp getCreateAt() {
@@ -76,6 +83,14 @@ public class ProjectResponse {
         return id;
     }
 
+    public List<String> getImages() {
+        return images;
+    }
+
+    public List<String> getTags() {
+        return tags;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -114,5 +129,13 @@ public class ProjectResponse {
 
     public void setCreateAt(Timestamp createAt) {
         this.createAt = createAt;
+    }
+
+    public void setImages(List<String> images) {
+        this.images = images;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
     }
 }
