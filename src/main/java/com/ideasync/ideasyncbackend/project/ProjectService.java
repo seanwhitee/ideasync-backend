@@ -157,4 +157,24 @@ public class ProjectService {
             return "Project created failed";
         }
     }
+
+    /** TODO: do not forget to delete the image at s3 from frontend.
+     * Method to delete the project
+     *
+     * @param id project id
+     * @return success message
+     */
+    public String deleteProjectById(Long id) {
+
+        Optional<Project> project = projectRepository.findById(id);
+        if (project.isPresent()) {
+            try {
+                projectRepository.delete(project.get());
+                return "Project deleted successfully";
+            } catch (Exception e) {
+                return "Project deletion failed";
+            }
+        }
+        return "Project not found";
+    }
 }

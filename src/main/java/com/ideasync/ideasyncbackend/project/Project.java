@@ -60,8 +60,6 @@ public class Project {
 
   @OneToMany(mappedBy = "project", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
   private List<Applicant> applicants;
-  // Constructors, getters, and setters
-
 
   public String getTitle() {
     return title;
