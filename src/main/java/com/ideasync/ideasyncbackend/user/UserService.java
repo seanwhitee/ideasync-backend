@@ -147,7 +147,9 @@ public class UserService {
     message.setSubject("Welcome to IdeaSync");
 
     String emailContentTemplate = """
-            歡迎來到IdeaSync,你的驗證碼為: %d
+            歡迎來到IdeaSync,
+            
+            你的驗證碼為: %d
             
             此驗證碼將在5分鐘後失效請勿將此驗證碼提供給他人
             
