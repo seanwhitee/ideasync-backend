@@ -95,6 +95,15 @@ public class ProjectService {
 
     }
 
+    public List<ProjectResponse> getAllProjects() {
+        List<Project> projects = projectRepository.findAll();
+        List<ProjectResponse> projectResponses = new ArrayList<>();
+        for (Project project : projects) {
+            projectResponses.add(setProjectResponse(project));
+        }
+        return projectResponses;
+    }
+
     public String createProject(ProjectRequest projectRequest) {
         // get user who intends to create the project
         Optional<User> user = userRepository.findById(projectRequest.getHostId());

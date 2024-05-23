@@ -1,7 +1,10 @@
 package com.ideasync.ideasyncbackend.project;
 
 import com.ideasync.ideasyncbackend.project.dto.ProjectRequest;
+import com.ideasync.ideasyncbackend.project.dto.ProjectResponse;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @CrossOrigin
 @RestController
@@ -21,6 +24,11 @@ public class ProjectController {
     @DeleteMapping("/delete")
     public String deleteProject(@RequestParam Long id) {
         return projectService.deleteProjectById(id);
+    }
+
+    @GetMapping("/getAllProjects")
+    public List<ProjectResponse> getAllProjects() {
+        return projectService.getAllProjects();
     }
 }
 
