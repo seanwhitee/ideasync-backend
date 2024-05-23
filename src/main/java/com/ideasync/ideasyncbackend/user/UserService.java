@@ -2,9 +2,10 @@ package com.ideasync.ideasyncbackend.user;
 
 
 import com.ideasync.ideasyncbackend.user.dto.UserResponse;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 
 import java.util.ArrayList;
@@ -95,7 +96,7 @@ public class UserService {
       return false;
     } else if (!username.matches("^[a-zA-Z0-9]{7,}$")) {
       return false;
-    } else return password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{9,}$");
+    } else return password.matches("^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{9,}$");
   }
 
 
@@ -141,17 +142,74 @@ public class UserService {
 
 
   public String sendPassCodeEmail(String from, String to, int passcode) {
-    SimpleMailMessage message = new SimpleMailMessage();
-    message.setFrom(from);
-    message.setTo(to);
-    message.setSubject("Welcome to IdeaSync");
-
-    String emailContentTemplate = "歡迎來到IdeaSync,\n\n你的驗證碼為: %d\n\n此驗證碼將在5分鐘後失效\n\n" +
-        "請勿將此驗證碼提供給他人\n\n謝謝您的配合\n\n\nIdeaSync團隊";
-    String emailContent = String.format(emailContentTemplate, passcode);
-
-    message.setText(emailContent);
     try {
+
+      MimeMessage message = emailSender.createMimeMessage();
+      MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+      helper.setFrom(from);
+      helper.setTo(to);
+      helper.setSubject("Welcome to IdeaSync");
+
+      String emailContent = """
+              <html>
+                <head>
+                  <style>
+                    body {
+                      font-family: Arial, sans-serif;
+                      background-color: #f4f4f4;
+                      margin: 0;
+                      padding: 0;
+                      color: #333333;
+                    }
+                    .container {
+                      background-color: #ffffff;
+                      margin: 50px auto;
+                      padding: 20px;
+                      border-radius: 10px;
+                      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                      max-width: 600px;
+                    }
+                    h1 {
+                      color: #5b21b6;
+                    }
+                    p {
+                      font-size: 16px;
+                      line-height: 1.5;
+                    }
+                    .code {
+                      font-size: 24px;
+                      font-weight: bold;
+                      color: #333333;
+                      background-color: #f2f2f2;
+                      padding: 10px;
+                      border-radius: 5px;
+                      display: inline-block;
+                      margin: 20px 0;
+                    }
+                    .footer {
+                      margin-top: 30px;
+                      font-size: 14px;
+                      color: #777777;
+                    }
+                  </style>
+                </head>
+                <body>
+                  <div class="container">
+                    <h1>Verification Code</h1>
+                    <p>Please use the verification code below to sign up.</p>
+                    <p>This code is valid for 5 minutes.</p>
+                    <div class="code">%d</div>
+                    <p>If you didn’t request this, you can ignore this email.</p>
+                    <p class="footer">Thanks,<br />The IdeaSync team</p>
+                  </div>
+                </body>
+              </html>
+              """;
+
+      emailContent = String.format(emailContent, passcode);
+      helper.setText(emailContent, true); // Set to true to indicate HTML content
+
       emailSender.send(message);
     } catch (Exception e) {
       return "Email sending failed";
@@ -159,6 +217,7 @@ public class UserService {
     return "Email sent successfully";
 
   }
+
 
   /**
    * Method to get user by id.
