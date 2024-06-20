@@ -186,4 +186,12 @@ public class ProjectService {
         }
         return "Project not found";
     }
+
+    public ProjectResponse getProjectById(Long id) {
+        Optional<Project> project = projectRepository.findById(id);
+        if (project.isPresent()) {
+            return setProjectResponse(project.get());
+        }
+        return null;
+    }
 }

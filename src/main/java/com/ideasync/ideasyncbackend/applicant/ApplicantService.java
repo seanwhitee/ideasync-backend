@@ -24,7 +24,6 @@ public class ApplicantService {
         this.userRepository = userRepository;
         this.projectRepository = projectRepository;
     }
-
     public List<Long> getApplicants(Long projectId) {
         List<Applicant> applicants =  applicantRepository.findByProjectId(projectId);
         List<Long> applicantUserIds = new ArrayList<>();
@@ -56,6 +55,11 @@ public class ApplicantService {
 
         try {
             applicantRepository.save(applicant);
+
+            if(user.getUserRole().getId() == 1) {
+                project.setApplicantCount(project.getApplicantCount() + 1);
+            }
+            projectRepository.save(project);
             return "Applicant added successfully";
         } catch (Exception e) {
             System.out.println(e);
@@ -86,6 +90,12 @@ public class ApplicantService {
         Applicant applicant = applicantRepository.findByProjectAndUser(project, user);
         try {
             applicantRepository.delete(applicant);
+
+            if(user.getUserRole().getId() == 1) {
+                project.setApplicantCount(project.getApplicantCount() - 1);
+            }
+
+            projectRepository.save(project);
             return "Applicant deleted successfully";
         } catch (Exception e) {
             System.out.println(e);

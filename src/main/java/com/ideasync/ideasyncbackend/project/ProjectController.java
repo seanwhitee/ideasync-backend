@@ -30,5 +30,10 @@ public class ProjectController {
     public List<ProjectResponse> getAllProjects() {
         return projectService.getAllProjects();
     }
+
+    @GetMapping("/getProjectById")
+    public ProjectResponse getProjectById(@RequestParam Long id) {
+        return projectService.getProjectById(id);
+    }
 }
 
