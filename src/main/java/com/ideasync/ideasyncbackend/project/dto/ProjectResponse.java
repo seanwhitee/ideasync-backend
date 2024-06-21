@@ -16,6 +16,7 @@ public class ProjectResponse {
     private Timestamp createAt;
     private List<String> images;
     private List<String> tags;
+    private String requireSkills;
 
     public ProjectResponse(Long id,
                            Long hostUserId,
@@ -28,7 +29,8 @@ public class ProjectResponse {
                            boolean isGraduationProject,
                            Timestamp createAt,
                            List<String> images,
-                           List<String> tags) {
+                           List<String> tags,
+                           String requireSkills) {
         this.id = id;
         this.hostUserId = hostUserId;
         this.statusId = statusId;
@@ -41,6 +43,15 @@ public class ProjectResponse {
         this.createAt = createAt;
         this.images = images;
         this.tags = tags;
+        this.requireSkills = requireSkills;
+    }
+
+    public String getRequireSkills() {
+        return requireSkills;
+    }
+
+    public void setRequireSkills(String requireSkills) {
+        this.requireSkills = requireSkills;
     }
 
     public Timestamp getCreateAt() {

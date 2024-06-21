@@ -36,6 +36,7 @@ public class ProjectService {
         String title = projectRequest.getTitle();
         String description = projectRequest.getDescription();
         Long statusId = projectRequest.getStatusId();
+        String requireSkills = projectRequest.getRequireSkills();
         String school = projectRequest.getSchool();
         int allowApplicantsNum = projectRequest.getAllowApplicantsNum();
         int applicantCount = projectRequest.getApplicantCount();
@@ -47,6 +48,7 @@ public class ProjectService {
                 && (description != null && !description.isEmpty())
                 && (statusId != null)
                 && (school != null && !school.isEmpty())
+                && (requireSkills != null && !requireSkills.isEmpty())
                 && (allowApplicantsNum != 0)
                 && (applicantCount <= 0);
     }
@@ -89,7 +91,8 @@ public class ProjectService {
                 project.isGraduationProject(),
                 project.getCreateAt(),
                 images,
-                tagNames
+                tagNames,
+                project.getRequireSkills()
 
         );
 
@@ -135,6 +138,7 @@ public class ProjectService {
         project.setSchool(projectRequest.getSchool());
         project.setAllowApplicantsNum(projectRequest.getAllowApplicantsNum());
         project.setApplicantCount(projectRequest.getApplicantCount());
+        project.setRequireSkills(projectRequest.getRequireSkills());
 
         try {
             projectRepository.save(project);
