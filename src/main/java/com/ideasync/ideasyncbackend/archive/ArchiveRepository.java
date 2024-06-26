@@ -11,4 +11,5 @@ import java.util.List;
 public interface ArchiveRepository extends JpaRepository<Archive, Long> {
     Archive findArchiveByProjectAndUser(Project project, User user);
     List<Archive> findArchivesByUserId(Long userId);
+    List<Archive> findArchivesByProject(Project project);
 }

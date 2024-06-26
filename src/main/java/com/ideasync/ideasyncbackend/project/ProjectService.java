@@ -1,6 +1,9 @@
 package com.ideasync.ideasyncbackend.project;
 
 
+import com.ideasync.ideasyncbackend.applicant.ApplicantRepository;
+import com.ideasync.ideasyncbackend.archive.ArchiveRepository;
+import com.ideasync.ideasyncbackend.comment.CommentRepository;
 import com.ideasync.ideasyncbackend.project.dto.ProjectRequest;
 import com.ideasync.ideasyncbackend.project.dto.ProjectResponse;
 import com.ideasync.ideasyncbackend.projectimage.ProjectImage;
@@ -10,26 +13,46 @@ import com.ideasync.ideasyncbackend.tag.Tag;
 import com.ideasync.ideasyncbackend.tag.TagRepository;
 import com.ideasync.ideasyncbackend.user.User;
 import com.ideasync.ideasyncbackend.user.UserRepository;
+import org.springframework.ai.document.Document;
+import org.springframework.ai.transformers.TransformersEmbeddingModel;
+import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class ProjectService {
+
+    private final TransformersEmbeddingModel embeddingModel;
+    private final VectorStore vectorStore;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
     private final TagRepository tagRepository;
     private final ProjectImageRepository projectImageRepository;
+    private final ArchiveRepository archiveRepository;
+    private final ApplicantRepository applicantRepository;
+    private final CommentRepository commentRepository;
+
 
     @Autowired
-    public ProjectService(ProjectRepository projectRepository, UserRepository userRepository, TagRepository tagRepository, ProjectImageRepository projectImageRepository) {
+    public ProjectService(TransformersEmbeddingModel embeddingModel,
+                          VectorStore vectorStore,
+                          ProjectRepository projectRepository,
+                          UserRepository userRepository,
+                          TagRepository tagRepository,
+                          ProjectImageRepository projectImageRepository, ArchiveRepository archiveRepository, ApplicantRepository applicantRepository, CommentRepository commentRepository) {
+        this.embeddingModel = embeddingModel;
+        this.vectorStore = vectorStore;
         this.projectRepository = projectRepository;
         this.userRepository = userRepository;
         this.tagRepository = tagRepository;
         this.projectImageRepository = projectImageRepository;
+        this.archiveRepository = archiveRepository;
+        this.applicantRepository = applicantRepository;
+        this.commentRepository = commentRepository;
     }
 
     public boolean isValidProjectData(ProjectRequest projectRequest) {
@@ -163,13 +186,26 @@ public class ProjectService {
                 }
             }
 
-            userRepository.save(user.get());
+            // save tags to vector store
+            List<Document> documents = new ArrayList<>();
+            for (Tag tag : tagRepository.findTagsByProject(project)) {
+                Map<String, Object> metadata = new HashMap<>();
+                metadata.put("tag_id", tag.getId());
+                metadata.put("project_id", project.getId());
+                documents.add(new Document(tag.getName(), metadata));
+            }
+
+            vectorStore.add(documents);
+
+
             return "Project created successfully";
 
         } catch (Exception e) {
             return "Project created failed";
         }
     }
+
+
 
     /** TODO: do not forget to delete the image at s3 from frontend.
      * Method to delete the project
@@ -180,9 +216,34 @@ public class ProjectService {
     public String deleteProjectById(Long id) {
 
         Optional<Project> project = projectRepository.findById(id);
+
         if (project.isPresent()) {
+            List<Tag> tags = tagRepository.findTagsByProject(project.get());
             try {
+                // Delete tags from vector store which project_id metadata is equal to project id.
+                FilterExpressionBuilder b = new FilterExpressionBuilder();
+
+                List<Document> results = vectorStore.similaritySearch(SearchRequest.defaults()
+                                .withTopK(tags.size())
+                                .withFilterExpression(b.eq("project_id", id).build()));
+
+                List<String> idList = new ArrayList<>();
+                for (Document document : results) {
+                    idList.add(document.getId());
+                }
+                vectorStore.delete(idList);
+            } catch (Exception e) {
+                return "Project deletion failed";
+            }
+
+            try {
+                tagRepository.deleteAll(tags);
+                projectImageRepository.deleteAll(projectImageRepository.findProjectImagesByProject(project.get()));
+                archiveRepository.deleteAll(archiveRepository.findArchivesByProject(project.get()));
+                applicantRepository.deleteAll(applicantRepository.findApplicantsByProject(project.get()));
+                commentRepository.deleteAll(commentRepository.findCommentsByProject(project.get()));
                 projectRepository.delete(project.get());
+
                 return "Project deleted successfully";
             } catch (Exception e) {
                 return "Project deletion failed";

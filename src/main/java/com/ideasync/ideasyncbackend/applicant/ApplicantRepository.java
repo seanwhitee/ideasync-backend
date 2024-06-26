@@ -11,4 +11,5 @@ import java.util.List;
 public interface ApplicantRepository extends JpaRepository<Applicant, Long> {
     List<Applicant> findByProjectId(Long projectId);
     Applicant findByProjectAndUser(Project project, User user);
+    List<Applicant> findApplicantsByProject(Project project);
 }
