@@ -36,6 +36,9 @@ public class Project {
   @Column(name = "isGraduationProject", nullable = false)
   private boolean isGraduationProject;
 
+  @Column(name = "requireSkills", nullable = false)
+  private String requireSkills;
+
   @Column(nullable = false)
   private String school;
 
@@ -60,6 +63,14 @@ public class Project {
 
   @OneToMany(mappedBy = "project", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
   private List<Applicant> applicants;
+
+  public String getRequireSkills() {
+    return requireSkills;
+  }
+
+    public void setRequireSkills(String requireSkills) {
+        this.requireSkills = requireSkills;
+    }
 
   public String getTitle() {
     return title;

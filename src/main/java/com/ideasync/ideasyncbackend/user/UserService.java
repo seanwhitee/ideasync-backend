@@ -52,7 +52,7 @@ public class UserService {
     return null;
   }
 
-  private UserResponse getUserResponse(User userData) {
+  public UserResponse getUserResponse(User userData) {
     UserResponse response = new UserResponse();
     response.setId(userData.getId());
     response.setNickName(userData.getNickName());

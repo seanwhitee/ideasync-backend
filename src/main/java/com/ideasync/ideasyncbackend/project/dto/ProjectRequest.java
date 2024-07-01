@@ -8,6 +8,7 @@ public class ProjectRequest {
   private String title;
   private String description;
   private Long statusId;
+  private String requireSkills;
   private boolean isGraduationProject;
   private String school;
   private int allowApplicantsNum;
@@ -27,7 +28,8 @@ public class ProjectRequest {
                         int applicantCount,
                         Timestamp createAt,
                         List<String> projectImages,
-                        List<String> tags) {
+                        List<String> tags,
+                        String requireSkills) {
     this.hostId = hostId;
     this.title = title;
     this.description = description;
@@ -39,6 +41,15 @@ public class ProjectRequest {
     this.createAt = createAt;
     this.projectImages = projectImages;
     this.tags = tags;
+    this.requireSkills = requireSkills;
+  }
+
+  public String getRequireSkills() {
+    return requireSkills;
+  }
+
+  public void setRequireSkills(String requireSkills) {
+      this.requireSkills = requireSkills;
   }
 
   public Long getHostId() {

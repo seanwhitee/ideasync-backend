@@ -1,10 +1,8 @@
 package com.ideasync.ideasyncbackend.projectstatus;
 
-import com.ideasync.ideasyncbackend.projectstatus.dto.ProjectStatusResponse;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.ideasync.ideasyncbackend.project.dto.ProjectResponse;
+import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @CrossOrigin
@@ -17,10 +15,8 @@ public class ProjectStatusController {
         this.projectStatusService = projectStatusService;
     }
 
-    @GetMapping("/getProjectStatusForTeachers")
-    public List<ProjectStatusResponse> getProjectStatusForTeachers(){return projectStatusService.getProjectStatusForTeachers();}
-
-    @GetMapping("/getProjectStatusForMembers")
-    public List<ProjectStatusResponse> getProjectStatusForMembers(){return projectStatusService.getProjectStatusForMembers();}
-
+    @GetMapping("/getRecommendProjectsByStatus")
+    public List<ProjectResponse> getRecommendProjectsByStatus(@RequestParam String status, @RequestParam Long userId) {
+        return projectStatusService.getRecommendProjectsByStatus(status, userId);
+    }
 }
