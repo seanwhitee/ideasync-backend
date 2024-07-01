@@ -14,9 +14,9 @@ public class ApplicantController {
         this.applicantService = applicantService;
     }
 
-    @GetMapping("/getApplicants")
+    @GetMapping("/getApplicantIds")
     public List<Long> getApplicants(@RequestParam Long projectId) {
-        return applicantService.getApplicants(projectId);
+        return applicantService.getApplicantIds(projectId);
     }
 
     @PostMapping("/addApplicant")

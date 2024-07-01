@@ -1,11 +1,14 @@
 package com.ideasync.ideasyncbackend.project.dto;
 
+import com.ideasync.ideasyncbackend.user.dto.UserResponse;
+import com.ideasync.ideasyncbackend.comment.dto.CommentChunk;
+
 import java.sql.Timestamp;
 import java.util.List;
 
 public class ProjectResponse {
     private Long id;
-    private Long hostUserId;
+    private UserResponse hostUser;
     private Long statusId;
     private String title;
     private String description;
@@ -17,9 +20,11 @@ public class ProjectResponse {
     private List<String> images;
     private List<String> tags;
     private String requireSkills;
+    private List<UserResponse> applicants;
+    private List<CommentChunk> commentChunks;
 
     public ProjectResponse(Long id,
-                           Long hostUserId,
+                           UserResponse hostUser,
                            Long statusId,
                            String title,
                            String description,
@@ -30,9 +35,11 @@ public class ProjectResponse {
                            Timestamp createAt,
                            List<String> images,
                            List<String> tags,
-                           String requireSkills) {
+                           String requireSkills,
+                           List<UserResponse> applicants,
+                           List<CommentChunk> commentChunks) {
         this.id = id;
-        this.hostUserId = hostUserId;
+        this.hostUser = hostUser;
         this.statusId = statusId;
         this.title = title;
         this.description = description;
@@ -44,6 +51,8 @@ public class ProjectResponse {
         this.images = images;
         this.tags = tags;
         this.requireSkills = requireSkills;
+        this.applicants = applicants;
+        this.commentChunks = commentChunks;
     }
 
     public String getRequireSkills() {
@@ -52,6 +61,30 @@ public class ProjectResponse {
 
     public void setRequireSkills(String requireSkills) {
         this.requireSkills = requireSkills;
+    }
+
+    public UserResponse getHostUser() {
+        return hostUser;
+    }
+
+    public void setHostUser(UserResponse hostUser) {
+        this.hostUser = hostUser;
+    }
+
+    public List<UserResponse> getApplicants() {
+        return applicants;
+    }
+
+    public void setApplicants(List<UserResponse> applicants) {
+        this.applicants = applicants;
+    }
+
+    public List<CommentChunk> getCommentChunks() {
+        return commentChunks;
+    }
+
+    public void setCommentChunks(List<CommentChunk> commentChunks) {
+        this.commentChunks = commentChunks;
     }
 
     public Timestamp getCreateAt() {
@@ -86,10 +119,6 @@ public class ProjectResponse {
         return statusId;
     }
 
-    public Long getHostUserId() {
-        return hostUserId;
-    }
-
     public Long getId() {
         return id;
     }
@@ -104,10 +133,6 @@ public class ProjectResponse {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public void setHostUserId(Long hostUserId) {
-        this.hostUserId = hostUserId;
     }
 
     public void setStatusId(Long statusId) {

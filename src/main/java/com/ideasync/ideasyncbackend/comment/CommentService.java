@@ -6,6 +6,8 @@ import com.ideasync.ideasyncbackend.project.Project;
 import com.ideasync.ideasyncbackend.project.ProjectRepository;
 import com.ideasync.ideasyncbackend.user.User;
 import com.ideasync.ideasyncbackend.user.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,12 +16,16 @@ import java.util.List;
 
 @Service
 public class CommentService {
-    public final CommentRepository commentRepository;
+    private static final Logger logger = LoggerFactory.getLogger(CommentService.class);
+    private final CommentRepository commentRepository;
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
 
+
     @Autowired
-    public CommentService(CommentRepository commentRepository, UserRepository userRepository, ProjectRepository projectRepository) {
+    public CommentService(CommentRepository commentRepository,
+                          UserRepository userRepository,
+                          ProjectRepository projectRepository) {
         this.commentRepository = commentRepository;
         this.userRepository = userRepository;
         this.projectRepository = projectRepository;
@@ -66,7 +72,7 @@ public class CommentService {
             commentRepository.save(comment);
             return "Reply added successfully";
         } catch (Exception e) {
-            System.out.println(e);
+            logger.error("Failed to add reply", e);
             return "Failed to add reply";
         }
 
@@ -98,7 +104,7 @@ public class CommentService {
             commentRepository.save(comment);
             return "Comment added successfully";
         } catch (Exception e) {
-            System.out.println(e);
+            logger.error("Failed to add comment", e);
             return "Failed to add comment";
         }
     }

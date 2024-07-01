@@ -2,8 +2,10 @@ package com.ideasync.ideasyncbackend.project;
 
 
 import com.ideasync.ideasyncbackend.applicant.ApplicantRepository;
+import com.ideasync.ideasyncbackend.applicant.ApplicantService;
 import com.ideasync.ideasyncbackend.archive.ArchiveRepository;
 import com.ideasync.ideasyncbackend.comment.CommentRepository;
+import com.ideasync.ideasyncbackend.comment.CommentService;
 import com.ideasync.ideasyncbackend.project.dto.ProjectRequest;
 import com.ideasync.ideasyncbackend.project.dto.ProjectResponse;
 import com.ideasync.ideasyncbackend.projectimage.ProjectImage;
@@ -13,8 +15,8 @@ import com.ideasync.ideasyncbackend.tag.Tag;
 import com.ideasync.ideasyncbackend.tag.TagRepository;
 import com.ideasync.ideasyncbackend.user.User;
 import com.ideasync.ideasyncbackend.user.UserRepository;
+import com.ideasync.ideasyncbackend.user.UserService;
 import org.springframework.ai.document.Document;
-import org.springframework.ai.transformers.TransformersEmbeddingModel;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
@@ -25,8 +27,6 @@ import java.util.*;
 
 @Service
 public class ProjectService {
-
-    private final TransformersEmbeddingModel embeddingModel;
     private final VectorStore vectorStore;
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
@@ -35,16 +35,18 @@ public class ProjectService {
     private final ArchiveRepository archiveRepository;
     private final ApplicantRepository applicantRepository;
     private final CommentRepository commentRepository;
+    private final UserService userService;
+    private final ApplicantService applicantService;
+    private final CommentService commentService;
 
 
     @Autowired
-    public ProjectService(TransformersEmbeddingModel embeddingModel,
-                          VectorStore vectorStore,
+    public ProjectService(VectorStore vectorStore,
                           ProjectRepository projectRepository,
                           UserRepository userRepository,
                           TagRepository tagRepository,
-                          ProjectImageRepository projectImageRepository, ArchiveRepository archiveRepository, ApplicantRepository applicantRepository, CommentRepository commentRepository) {
-        this.embeddingModel = embeddingModel;
+                          ProjectImageRepository projectImageRepository, ArchiveRepository archiveRepository, ApplicantRepository applicantRepository, CommentRepository commentRepository, UserService userService, ApplicantService applicantService, CommentService commentService) {
+
         this.vectorStore = vectorStore;
         this.projectRepository = projectRepository;
         this.userRepository = userRepository;
@@ -53,6 +55,9 @@ public class ProjectService {
         this.archiveRepository = archiveRepository;
         this.applicantRepository = applicantRepository;
         this.commentRepository = commentRepository;
+        this.userService = userService;
+        this.applicantService = applicantService;
+        this.commentService = commentService;
     }
 
     public boolean isValidProjectData(ProjectRequest projectRequest) {
@@ -104,7 +109,7 @@ public class ProjectService {
 
         return new ProjectResponse(
                 project.getId(),
-                project.getUser().getId(),
+                userService.getUserResponse(project.getUser()),
                 project.getProjectStatus().getId(),
                 project.getTitle(),
                 project.getDescription(),
@@ -115,19 +120,11 @@ public class ProjectService {
                 project.getCreateAt(),
                 images,
                 tagNames,
-                project.getRequireSkills()
-
+                project.getRequireSkills(),
+                applicantService.getApplicants(project.getId()),
+                commentService.getAllCommentChunks(project.getId())
         );
 
-    }
-
-    public List<ProjectResponse> getAllProjects() {
-        List<Project> projects = projectRepository.findAll();
-        List<ProjectResponse> projectResponses = new ArrayList<>();
-        for (Project project : projects) {
-            projectResponses.add(setProjectResponse(project));
-        }
-        return projectResponses;
     }
 
     public String createProject(ProjectRequest projectRequest) {
@@ -136,17 +133,26 @@ public class ProjectService {
         Project project = new Project();
 
 
-        // check user is allowed to create project
-        if (user.isPresent()) {
-            if (!user.get().isAllowProjectCreate()) {
-                return "User is not allowed to create project";
-            } else if (!isValidProjectData(projectRequest)) {
-                return "Invalid project data";
-            } else if (!checkProjectWithoutSameTitle(user.get(), projectRequest.getTitle())) {
-                return "Project with the same title already exists";
-            }
-        } else {
+        // check if user is present
+        if (user.isEmpty()) {
             return "User not found";
+        }
+
+        User currentUser = user.get();
+
+        // check if user is allowed to create project
+        if (!currentUser.isAllowProjectCreate()) {
+            return "User is not allowed to create project";
+        }
+
+        // check if project data is valid
+        if (!isValidProjectData(projectRequest)) {
+            return "Invalid project data";
+        }
+
+        // check if project with the same title exists
+        if (!checkProjectWithoutSameTitle(currentUser, projectRequest.getTitle())) {
+            return "Project with the same title already exists";
         }
 
         ProjectStatus projectStatus = new ProjectStatus();
@@ -254,9 +260,6 @@ public class ProjectService {
 
     public ProjectResponse getProjectById(Long id) {
         Optional<Project> project = projectRepository.findById(id);
-        if (project.isPresent()) {
-            return setProjectResponse(project.get());
-        }
-        return null;
+        return project.map(this::setProjectResponse).orElse(null);
     }
 }

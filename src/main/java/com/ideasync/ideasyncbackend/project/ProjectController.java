@@ -4,8 +4,6 @@ import com.ideasync.ideasyncbackend.project.dto.ProjectRequest;
 import com.ideasync.ideasyncbackend.project.dto.ProjectResponse;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @CrossOrigin
 @RestController
 @RequestMapping("/api/v1/project")
@@ -26,10 +24,6 @@ public class ProjectController {
         return projectService.deleteProjectById(id);
     }
 
-    @GetMapping("/getAllProjects")
-    public List<ProjectResponse> getAllProjects() {
-        return projectService.getAllProjects();
-    }
 
     @GetMapping("/getProjectById")
     public ProjectResponse getProjectById(@RequestParam Long id) {

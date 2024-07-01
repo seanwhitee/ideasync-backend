@@ -1,5 +1,6 @@
 package com.ideasync.ideasyncbackend.archive;
 
+import com.ideasync.ideasyncbackend.project.dto.ProjectResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public class ArchiveController {
     }
 
     @GetMapping("/getArchives")
-    public List<Long> getArchives(@RequestParam Long userId) {
+    public List<ProjectResponse> getArchives(@RequestParam Long userId) {
         return archiveService.getArchives(userId);
     }
 
