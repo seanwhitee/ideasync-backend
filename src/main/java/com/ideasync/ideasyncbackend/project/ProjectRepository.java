@@ -1,5 +1,6 @@
 package com.ideasync.ideasyncbackend.project;
 
+import com.ideasync.ideasyncbackend.projectstatus.ProjectStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -13,4 +14,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long>{
     List<Project> findProjectsByUser(User user);
     Project findBySchool(String school);
     Project findByDescription(String description);
+    List<Project> findProjectByProjectStatus(ProjectStatus projectStatus);
+    List<Project> findProjectsByTitleContaining(String searchString);
 }

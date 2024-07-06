@@ -21,14 +21,20 @@ public class ProjectController {
         return projectService.createProject(projectRequest);
     }
 
+    @GetMapping("/search")
+    public List<ProjectResponse> searchProject(@RequestParam String searchString) {
+        return projectService.searchProject(searchString);
+    }
+
     @DeleteMapping("/delete")
     public String deleteProject(@RequestParam Long id) {
         return projectService.deleteProjectById(id);
     }
 
-    @GetMapping("/getAllProjects")
-    public List<ProjectResponse> getAllProjects() {
-        return projectService.getAllProjects();
+
+    @GetMapping("/getProjectById")
+    public ProjectResponse getProjectById(@RequestParam Long id) {
+        return projectService.getProjectById(id);
     }
 }
 

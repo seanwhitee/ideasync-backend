@@ -31,6 +31,9 @@ public class Comment {
   @Column(length = 100)
   private String text;
 
+  @Column(name = "parentId")
+  private Long parentId;
+
   // Constructors, getters, and setters
 
   public Long getId() {
@@ -53,6 +56,10 @@ public class Comment {
     return text;
   }
 
+  public Long getParentId() {
+    return parentId;
+  }
+
   public void setId(Long id) {
     this.id = id;
   }
@@ -71,5 +78,9 @@ public class Comment {
 
   public void setText(String text) {
     this.text = text;
+  }
+
+  public void setParentId(Long parentId) {
+      this.parentId = parentId;
   }
 }
