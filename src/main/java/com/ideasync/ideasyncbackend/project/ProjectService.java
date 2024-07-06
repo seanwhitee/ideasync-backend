@@ -211,6 +211,17 @@ public class ProjectService {
         }
     }
 
+    public List<ProjectResponse> searchProject(String searchString) {
+        List<ProjectResponse> result = new ArrayList<>();
+
+        // search for title
+        List<Project> projects = projectRepository.findProjectsByTitleContaining(searchString);
+
+        for (Project project : projects) {
+            result.add(setProjectResponse(project));
+        }
+        return result;
+    }
 
 
     /** TODO: do not forget to delete the image at s3 from frontend.

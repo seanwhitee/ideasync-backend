@@ -15,4 +15,5 @@ public interface ProjectRepository extends JpaRepository<Project, Long>{
     Project findBySchool(String school);
     Project findByDescription(String description);
     List<Project> findProjectByProjectStatus(ProjectStatus projectStatus);
+    List<Project> findProjectsByTitleContaining(String searchString);
 }

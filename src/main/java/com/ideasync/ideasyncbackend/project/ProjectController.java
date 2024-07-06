@@ -4,6 +4,8 @@ import com.ideasync.ideasyncbackend.project.dto.ProjectRequest;
 import com.ideasync.ideasyncbackend.project.dto.ProjectResponse;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @CrossOrigin
 @RestController
 @RequestMapping("/api/v1/project")
@@ -17,6 +19,11 @@ public class ProjectController {
     @PostMapping("/create")
     public String createProject(@RequestBody ProjectRequest projectRequest) {
         return projectService.createProject(projectRequest);
+    }
+
+    @GetMapping("/search")
+    public List<ProjectResponse> searchProject(@RequestParam String searchString) {
+        return projectService.searchProject(searchString);
     }
 
     @DeleteMapping("/delete")

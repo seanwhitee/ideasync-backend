@@ -1,5 +1,6 @@
 package com.ideasync.ideasyncbackend.applicant;
 
+import com.ideasync.ideasyncbackend.user.dto.UserResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,9 +15,9 @@ public class ApplicantController {
         this.applicantService = applicantService;
     }
 
-    @GetMapping("/getApplicantIds")
-    public List<Long> getApplicants(@RequestParam Long projectId) {
-        return applicantService.getApplicantIds(projectId);
+    @GetMapping("/getApplicants")
+    public List<UserResponse> getApplicants(@RequestParam Long projectId) {
+        return applicantService.getApplicants(projectId);
     }
 
     @PostMapping("/addApplicant")
