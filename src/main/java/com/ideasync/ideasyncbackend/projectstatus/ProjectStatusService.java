@@ -48,15 +48,16 @@ public class ProjectStatusService {
             return new ArrayList<>();
         }
 
-        List<Long> recommendProjectIds = getRecommendProjectIds(user);
+        List<Long> recommendProjectIds = getRecommendProjectIds(
+                user.getProfileDescription());
         List<Project> projects = getProjectsByStatus(status);
         List<Project> sortedProjects = sortProjects(recommendProjectIds, projects);
         return convertToProjectResponses(sortedProjects);
     }
 
-    private List<Long> getRecommendProjectIds(User user) {
+    public List<Long> getRecommendProjectIds(String s) {
         List<Document> recommendProjects = vectorStore.similaritySearch(SearchRequest.defaults()
-                .withQuery(user.getProfileDescription())
+                .withQuery(s)
                 .withTopK(10));
 
         List<Long> recommendProjectIds = new ArrayList<>();
@@ -94,6 +95,8 @@ public class ProjectStatusService {
                 }
             }
         }
+
+        /* Attach the rest of the projects. */
         for (Project project : projects) {
             if (!sortedProjects.contains(project)) {
                 sortedProjects.add(project);

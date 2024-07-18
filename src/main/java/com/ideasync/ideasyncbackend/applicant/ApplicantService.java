@@ -1,5 +1,6 @@
 package com.ideasync.ideasyncbackend.applicant;
 
+import com.ideasync.ideasyncbackend.applicant.dto.ApplicantResponse;
 import com.ideasync.ideasyncbackend.project.Project;
 import com.ideasync.ideasyncbackend.project.ProjectRepository;
 import com.ideasync.ideasyncbackend.user.User;
@@ -39,14 +40,17 @@ public class ApplicantService {
         return applicantUserIds;
     }
 
-    public List<UserResponse> getApplicants(Long projectId) {
-        List<Applicant> applicants =  applicantRepository.findByProjectId(projectId);
-        List<UserResponse> applicantUsers = new ArrayList<>();
-        for (Applicant applicant : applicants) {
-            User user = applicant.getUser();
-            applicantUsers.add(userService.getUserResponse(user));
+    public List<ApplicantResponse> getApplicants(Long projectId) {
+        List<Applicant> applicants = applicantRepository.findByProjectId(projectId);
+        List<ApplicantResponse> applicantResponses = new ArrayList<>();
+
+        for (Applicant app: applicants) {
+            UserResponse userRes = userService.getUserResponse(app.getUser());
+            int status = app.getVerified();
+            applicantResponses.add(new ApplicantResponse(userRes, status));
         }
-        return applicantUsers;
+
+        return  applicantResponses;
     }
 
     public String addApplicant(Long projectId, Long userId) {

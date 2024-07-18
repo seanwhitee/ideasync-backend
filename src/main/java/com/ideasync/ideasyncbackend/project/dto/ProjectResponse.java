@@ -1,5 +1,6 @@
 package com.ideasync.ideasyncbackend.project.dto;
 
+import com.ideasync.ideasyncbackend.applicant.dto.ApplicantResponse;
 import com.ideasync.ideasyncbackend.user.dto.UserResponse;
 import com.ideasync.ideasyncbackend.comment.dto.CommentChunk;
 
@@ -20,7 +21,7 @@ public class ProjectResponse {
     private List<String> images;
     private List<String> tags;
     private String requireSkills;
-    private List<UserResponse> applicants;
+    private List<ApplicantResponse> applicants;
     private List<CommentChunk> commentChunks;
 
     public ProjectResponse(Long id,
@@ -36,7 +37,7 @@ public class ProjectResponse {
                            List<String> images,
                            List<String> tags,
                            String requireSkills,
-                           List<UserResponse> applicants,
+                           List<ApplicantResponse> applicants,
                            List<CommentChunk> commentChunks) {
         this.id = id;
         this.hostUser = hostUser;
@@ -71,11 +72,11 @@ public class ProjectResponse {
         this.hostUser = hostUser;
     }
 
-    public List<UserResponse> getApplicants() {
+    public List<ApplicantResponse> getApplicants() {
         return applicants;
     }
 
-    public void setApplicants(List<UserResponse> applicants) {
+    public void setApplicants(List<ApplicantResponse> applicants) {
         this.applicants = applicants;
     }
 
