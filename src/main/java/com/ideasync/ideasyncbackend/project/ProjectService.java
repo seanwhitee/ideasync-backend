@@ -315,27 +315,29 @@ public class ProjectService {
         return responses;
     }
 
-    public ProjectResponse changeProjectStatus(Long projectId, Long changeToWhat) {
+    public ProjectResponse changeProjectStatus(Long projectId, Long changeToWhat, String nextOrPrevious) {
         Project project = projectRepository.findProjectById(projectId);
-        // check if applicants all reviewed
-        List<Applicant> applicants = applicantRepository.findApplicantsByProject(project);
-        for (Applicant app: applicants) {
-            if (app.getVerified() == 0) {
+        if (nextOrPrevious.equals("next")) {
+            // check if applicants all reviewed
+            List<Applicant> applicants = applicantRepository.findApplicantsByProject(project);
+            for (Applicant app: applicants) {
+                if (app.getVerified() == 0) {
+                    return null;
+                }
+            }
+
+            int acceptedApplicantsNum = 0;
+            for (Applicant app: applicants) {
+                if (app.getVerified() == 1) {
+                    acceptedApplicantsNum++;
+                }
+            }
+            // check if allowApplicantsNum > acceptedApplicantsNum
+            int allowApplicantsNum = project.getAllowApplicantsNum();
+
+            if (allowApplicantsNum < acceptedApplicantsNum) {
                 return null;
             }
-        }
-
-        int acceptedApplicantsNum = 0;
-        for (Applicant app: applicants) {
-            if (app.getVerified() == 1) {
-                acceptedApplicantsNum++;
-            }
-        }
-        // check if allowApplicantsNum > acceptedApplicantsNum
-        int allowApplicantsNum = project.getAllowApplicantsNum();
-
-        if (allowApplicantsNum < acceptedApplicantsNum) {
-            return null;
         }
         try {
             ProjectStatus statusChangeTo = projectStatusRepository.findStatusById(changeToWhat);

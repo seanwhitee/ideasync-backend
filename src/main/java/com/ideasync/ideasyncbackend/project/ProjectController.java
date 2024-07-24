@@ -48,8 +48,10 @@ public class ProjectController {
     }
 
     @PostMapping("/changeProjectStatus")
-    public ProjectResponse changeProjectStatus(@RequestParam Long projectId, @RequestParam Long status) {
-        return projectService.changeProjectStatus(projectId, status);
+    public ProjectResponse changeProjectStatus(@RequestParam Long projectId,
+                                               @RequestParam Long status,
+                                               @RequestParam String nextOrPrevious) {
+        return projectService.changeProjectStatus(projectId, status, nextOrPrevious);
     }
 }
 
