@@ -3,6 +3,9 @@ package com.ideasync.ideasyncbackend.applicant;
 import com.ideasync.ideasyncbackend.applicant.dto.ApplicantResponse;
 import com.ideasync.ideasyncbackend.project.Project;
 import com.ideasync.ideasyncbackend.project.ProjectRepository;
+import com.ideasync.ideasyncbackend.project.ProjectService;
+import com.ideasync.ideasyncbackend.project.dto.ProjectResponse;
+import com.ideasync.ideasyncbackend.projectstatus.ProjectStatus;
 import com.ideasync.ideasyncbackend.user.User;
 import com.ideasync.ideasyncbackend.user.UserRepository;
 import com.ideasync.ideasyncbackend.user.UserService;
@@ -23,13 +26,15 @@ public class ApplicantService {
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
     private final UserService userService;
+    private final ProjectService projectService;
 
     @Autowired
-    public ApplicantService(ApplicantRepository applicantRepository, UserRepository userRepository, ProjectRepository projectRepository, UserService userService) {
+    public ApplicantService(ApplicantRepository applicantRepository, UserRepository userRepository, ProjectRepository projectRepository, UserService userService, ProjectService projectService) {
         this.applicantRepository = applicantRepository;
         this.userRepository = userRepository;
         this.projectRepository = projectRepository;
         this.userService = userService;
+        this.projectService = projectService;
     }
     public List<Long> getApplicantIds(Long projectId) {
         List<Applicant> applicants =  applicantRepository.findByProjectId(projectId);
@@ -41,13 +46,18 @@ public class ApplicantService {
     }
 
     public List<ApplicantResponse> getApplicants(Long projectId) {
+        Project p = projectRepository.findProjectById(projectId);
+        ProjectStatus projectStatus = p.getProjectStatus();
         List<Applicant> applicants = applicantRepository.findByProjectId(projectId);
         List<ApplicantResponse> applicantResponses = new ArrayList<>();
 
         for (Applicant app: applicants) {
             UserResponse userRes = userService.getUserResponse(app.getUser());
-            int status = app.getVerified();
-            applicantResponses.add(new ApplicantResponse(userRes, status));
+            int applicantStatus = app.getVerified();
+            if ((projectStatus.getStatus().equals("member_recruiting") && app.getUser().getUserRole().getRoleName().equals("creator")
+            || (projectStatus.getStatus().equals("mentor_recruiting") && app.getUser().getUserRole().getRoleName().equals("mentor")))) {
+                applicantResponses.add(new ApplicantResponse(userRes, applicantStatus));
+            }
         }
 
         return  applicantResponses;
@@ -75,11 +85,6 @@ public class ApplicantService {
 
         try {
             applicantRepository.save(applicant);
-
-            if(user.getUserRole().getId() == 1) {
-                project.setApplicantCount(project.getApplicantCount() + 1);
-            }
-            projectRepository.save(project);
             return "Applicant added successfully";
         } catch (Exception e) {
             logger.error("Error adding applicant", e);
@@ -110,17 +115,65 @@ public class ApplicantService {
         Applicant applicant = applicantRepository.findByProjectAndUser(project, user);
         try {
             applicantRepository.delete(applicant);
-
-            if(user.getUserRole().getId() == 1) {
-                project.setApplicantCount(project.getApplicantCount() - 1);
-            }
-
-            projectRepository.save(project);
             return "Applicant deleted successfully";
         } catch (Exception e) {
             logger.error("Error deleting applicant", e);
             return "Error deleting applicant";
         }
 
+    }
+
+    public ApplicantResponse rejectApplicant(Long projectId, Long userId) {
+        Project p = projectRepository.findProjectById(projectId);
+        User u = userRepository.findUserById(userId);
+        Applicant targetRecord = applicantRepository
+                .findByProjectAndUser(p, u);
+        targetRecord.setVerified(-1);
+        try {
+            applicantRepository.save(targetRecord);
+            return new ApplicantResponse(userService.getUserResponse(u), -1);
+        } catch (Exception e) {
+            logger.error("Error rejecting applicant", e);
+            return null;
+        }
+    }
+
+    public ApplicantResponse acceptApplicant(Long projectId, Long userId) {
+        Project p = projectRepository.findProjectById(projectId);
+        User u = userRepository.findUserById(userId);
+        Applicant targetRecord = applicantRepository
+                .findByProjectAndUser(p, u);
+        targetRecord.setVerified(1);
+        try {
+            applicantRepository.save(targetRecord);
+            return new ApplicantResponse(userService.getUserResponse(u), 1);
+        } catch (Exception e) {
+            logger.error("Error accepting applicant", e);
+            return null;
+        }
+    }
+
+    public List<ProjectResponse> getProjectAppliedByUser(Long userId) {
+        User u = userRepository.findUserById(userId);
+        List<Applicant> applicants = applicantRepository.findApplicantsByUser(u);
+        
+        List<ProjectResponse> projectResponses = new ArrayList<>();
+        for (Applicant app: applicants) {
+            Project p = app.getProject();
+
+            ProjectResponse ps = projectService.setProjectResponse(p);
+            List<ApplicantResponse> applicantResponses = new ArrayList<>();
+            for (Applicant appInP : p.getApplicants()) {
+                applicantResponses.add(
+                        new ApplicantResponse((
+                                userService.getUserResponse(appInP.getUser())),
+                                appInP.getVerified())
+                );
+            }
+
+            ps.setApplicants(applicantResponses);
+            projectResponses.add(ps);
+        }
+        return projectResponses;
     }
 }

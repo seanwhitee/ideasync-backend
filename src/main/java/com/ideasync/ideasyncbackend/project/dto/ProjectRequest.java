@@ -12,7 +12,6 @@ public class ProjectRequest {
   private boolean isGraduationProject;
   private String school;
   private int allowApplicantsNum;
-  private int applicantCount;
   private Timestamp createAt;
   private List<String> projectImages;
   private List<String> tags;
@@ -25,7 +24,6 @@ public class ProjectRequest {
                         boolean isGraduationProject,
                         String school,
                         int allowApplicantsNum,
-                        int applicantCount,
                         Timestamp createAt,
                         List<String> projectImages,
                         List<String> tags,
@@ -37,7 +35,6 @@ public class ProjectRequest {
     this.isGraduationProject = isGraduationProject;
     this.school = school;
     this.allowApplicantsNum = allowApplicantsNum;
-    this.applicantCount = applicantCount;
     this.createAt = createAt;
     this.projectImages = projectImages;
     this.tags = tags;
@@ -80,10 +77,6 @@ public class ProjectRequest {
     return allowApplicantsNum;
   }
 
-  public int getApplicantCount() {
-    return applicantCount;
-  }
-
   public Timestamp getCreateAt() {
     return createAt;
   }
@@ -122,10 +115,6 @@ public class ProjectRequest {
 
   public void setAllowApplicantsNum(int allowApplicantsNum) {
     this.allowApplicantsNum = allowApplicantsNum;
-  }
-
-  public void setApplicantCount(int applicantCount) {
-    this.applicantCount = applicantCount;
   }
 
   public void setCreateAt(Timestamp createAt) {

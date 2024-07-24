@@ -15,7 +15,6 @@ public class ProjectResponse {
     private String description;
     private String school;
     private int allowApplicantsNum;
-    private int applicantCount;
     private boolean isGraduationProject;
     private Timestamp createAt;
     private List<String> images;
@@ -31,7 +30,6 @@ public class ProjectResponse {
                            String description,
                            String school,
                            int allowApplicantsNum,
-                           int applicantCount,
                            boolean isGraduationProject,
                            Timestamp createAt,
                            List<String> images,
@@ -46,7 +44,6 @@ public class ProjectResponse {
         this.description = description;
         this.school = school;
         this.allowApplicantsNum = allowApplicantsNum;
-        this.applicantCount = applicantCount;
         this.isGraduationProject = isGraduationProject;
         this.createAt = createAt;
         this.images = images;
@@ -94,10 +91,6 @@ public class ProjectResponse {
 
     public boolean isGraduationProject() {
         return isGraduationProject;
-    }
-
-    public int getApplicantCount() {
-        return applicantCount;
     }
 
     public int getAllowApplicantsNum() {
@@ -154,10 +147,6 @@ public class ProjectResponse {
 
     public void setAllowApplicantsNum(int allowApplicantsNum) {
         this.allowApplicantsNum = allowApplicantsNum;
-    }
-
-    public void setApplicantCount(int applicantCount) {
-        this.applicantCount = applicantCount;
     }
 
     public void setGraduationProject(boolean graduationProject) {

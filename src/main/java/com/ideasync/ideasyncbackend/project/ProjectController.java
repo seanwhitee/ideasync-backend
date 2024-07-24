@@ -46,5 +46,10 @@ public class ProjectController {
     public List<ProjectResponse> getRelatedProjects(@RequestParam Long projectId) {
         return projectService.getRelatedProjects(projectId);
     }
+
+    @PostMapping("/changeProjectStatus")
+    public ProjectResponse changeProjectStatus(@RequestParam Long projectId, @RequestParam Long status) {
+        return projectService.changeProjectStatus(projectId, status);
+    }
 }
 
