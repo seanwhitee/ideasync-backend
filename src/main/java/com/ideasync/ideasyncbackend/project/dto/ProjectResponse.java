@@ -1,5 +1,6 @@
 package com.ideasync.ideasyncbackend.project.dto;
 
+import com.ideasync.ideasyncbackend.applicant.dto.ApplicantResponse;
 import com.ideasync.ideasyncbackend.user.dto.UserResponse;
 import com.ideasync.ideasyncbackend.comment.dto.CommentChunk;
 
@@ -14,13 +15,12 @@ public class ProjectResponse {
     private String description;
     private String school;
     private int allowApplicantsNum;
-    private int applicantCount;
     private boolean isGraduationProject;
     private Timestamp createAt;
     private List<String> images;
     private List<String> tags;
     private String requireSkills;
-    private List<UserResponse> applicants;
+    private List<ApplicantResponse> applicants;
     private List<CommentChunk> commentChunks;
 
     public ProjectResponse(Long id,
@@ -30,13 +30,12 @@ public class ProjectResponse {
                            String description,
                            String school,
                            int allowApplicantsNum,
-                           int applicantCount,
                            boolean isGraduationProject,
                            Timestamp createAt,
                            List<String> images,
                            List<String> tags,
                            String requireSkills,
-                           List<UserResponse> applicants,
+                           List<ApplicantResponse> applicants,
                            List<CommentChunk> commentChunks) {
         this.id = id;
         this.hostUser = hostUser;
@@ -45,7 +44,6 @@ public class ProjectResponse {
         this.description = description;
         this.school = school;
         this.allowApplicantsNum = allowApplicantsNum;
-        this.applicantCount = applicantCount;
         this.isGraduationProject = isGraduationProject;
         this.createAt = createAt;
         this.images = images;
@@ -71,11 +69,11 @@ public class ProjectResponse {
         this.hostUser = hostUser;
     }
 
-    public List<UserResponse> getApplicants() {
+    public List<ApplicantResponse> getApplicants() {
         return applicants;
     }
 
-    public void setApplicants(List<UserResponse> applicants) {
+    public void setApplicants(List<ApplicantResponse> applicants) {
         this.applicants = applicants;
     }
 
@@ -93,10 +91,6 @@ public class ProjectResponse {
 
     public boolean isGraduationProject() {
         return isGraduationProject;
-    }
-
-    public int getApplicantCount() {
-        return applicantCount;
     }
 
     public int getAllowApplicantsNum() {
@@ -153,10 +147,6 @@ public class ProjectResponse {
 
     public void setAllowApplicantsNum(int allowApplicantsNum) {
         this.allowApplicantsNum = allowApplicantsNum;
-    }
-
-    public void setApplicantCount(int applicantCount) {
-        this.applicantCount = applicantCount;
     }
 
     public void setGraduationProject(boolean graduationProject) {

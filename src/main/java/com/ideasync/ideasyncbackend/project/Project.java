@@ -45,9 +45,6 @@ public class Project {
   @Column(name = "allowApplicantsNum", nullable = false)
   private int allowApplicantsNum;
 
-  @Column(name = "applicantCount", nullable = false)
-  private int applicantCount;
-
   @CreationTimestamp
   @Column(name = "createAt", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
   private Timestamp createAt;
@@ -112,10 +109,6 @@ public class Project {
     return allowApplicantsNum;
   }
 
-  public int getApplicantCount() {
-    return applicantCount;
-  }
-
   public List<ProjectImage> getProjectImages() {
     return projectImages;
   }
@@ -162,10 +155,6 @@ public class Project {
 
   public void setAllowApplicantsNum(int allowApplicantsNum) {
     this.allowApplicantsNum = allowApplicantsNum;
-  }
-
-  public void setApplicantCount(int applicantCount) {
-    this.applicantCount = applicantCount;
   }
 
   public void setProjectImages(List<ProjectImage> projectImages) {

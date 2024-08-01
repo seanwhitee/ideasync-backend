@@ -28,7 +28,18 @@ public class Applicant {
   @JoinColumn(name = "projectId", nullable = false)
   private Project project;
 
+  @Column(name="verified", nullable = false, columnDefinition = "INTEGER DEFAULT 0")
+  private int verified;
+
   // Constructors, getters, and setters
+
+  public int getVerified() {
+    return verified;
+  }
+
+  public void setVerified(int verified) {
+    this.verified = verified;
+  }
 
   public Long getId() {
     return id;

@@ -58,8 +58,11 @@ public class ArchiveService {
         List<ProjectResponse> projectResponses = new ArrayList<>();
         for (Archive archive : archives) {
             Project project = archive.getProject();
-            projectResponses.add(projectService.setProjectResponse(project));
+            if (project.getProjectStatus().getId() != 3) {
+                projectResponses.add(projectService.setProjectResponse(project));
+            }
         }
+
         return projectResponses;
 
     }

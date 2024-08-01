@@ -26,6 +26,11 @@ public class ProjectController {
         return projectService.searchProject(searchString);
     }
 
+    @GetMapping("/getProjectsByUser")
+    public List<ProjectResponse> getProjectsByUser(@RequestParam Long userId) {
+        return projectService.getProjectsByUser(userId);
+    }
+
     @DeleteMapping("/delete")
     public String deleteProject(@RequestParam Long id) {
         return projectService.deleteProjectById(id);
@@ -35,6 +40,18 @@ public class ProjectController {
     @GetMapping("/getProjectById")
     public ProjectResponse getProjectById(@RequestParam Long id) {
         return projectService.getProjectById(id);
+    }
+
+    @GetMapping("/getRelatedProjects")
+    public List<ProjectResponse> getRelatedProjects(@RequestParam Long projectId) {
+        return projectService.getRelatedProjects(projectId);
+    }
+
+    @PostMapping("/changeProjectStatus")
+    public ProjectResponse changeProjectStatus(@RequestParam Long projectId,
+                                               @RequestParam Long status,
+                                               @RequestParam String nextOrPrevious) {
+        return projectService.changeProjectStatus(projectId, status, nextOrPrevious);
     }
 }
 

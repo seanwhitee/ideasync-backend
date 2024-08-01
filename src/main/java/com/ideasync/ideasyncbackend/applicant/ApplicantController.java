@@ -1,6 +1,7 @@
 package com.ideasync.ideasyncbackend.applicant;
 
-import com.ideasync.ideasyncbackend.user.dto.UserResponse;
+import com.ideasync.ideasyncbackend.applicant.dto.ApplicantResponse;
+import com.ideasync.ideasyncbackend.project.dto.ProjectResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public class ApplicantController {
     }
 
     @GetMapping("/getApplicants")
-    public List<UserResponse> getApplicants(@RequestParam Long projectId) {
+    public List<ApplicantResponse> getApplicants(@RequestParam Long projectId) {
         return applicantService.getApplicants(projectId);
     }
 
@@ -28,5 +29,20 @@ public class ApplicantController {
     @DeleteMapping("/deleteApplicant")
     public String deleteApplicant(@RequestParam Long projectId, @RequestParam Long userId) {
         return applicantService.deleteApplicant(projectId, userId);
+    }
+
+    @PostMapping("/acceptApplicant")
+    public ApplicantResponse acceptApplicant(@RequestParam Long projectId, @RequestParam Long userId) {
+        return applicantService.acceptApplicant(projectId, userId);
+    }
+
+    @PostMapping("/rejectApplicant")
+    public ApplicantResponse rejectApplicant(@RequestParam Long projectId, @RequestParam Long userId) {
+        return applicantService.rejectApplicant(projectId, userId);
+    }
+
+    @GetMapping("/getProjectAppliedByUser")
+    public List<ProjectResponse> getProjectAppliedByUser(@RequestParam Long userId) {
+        return applicantService.getProjectAppliedByUser(userId);
     }
 }

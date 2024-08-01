@@ -1,6 +1,7 @@
 package com.ideasync.ideasyncbackend.project;
 
 
+import com.ideasync.ideasyncbackend.applicant.Applicant;
 import com.ideasync.ideasyncbackend.applicant.ApplicantRepository;
 import com.ideasync.ideasyncbackend.applicant.ApplicantService;
 import com.ideasync.ideasyncbackend.archive.ArchiveRepository;
@@ -11,6 +12,8 @@ import com.ideasync.ideasyncbackend.project.dto.ProjectResponse;
 import com.ideasync.ideasyncbackend.projectimage.ProjectImage;
 import com.ideasync.ideasyncbackend.projectimage.ProjectImageRepository;
 import com.ideasync.ideasyncbackend.projectstatus.ProjectStatus;
+import com.ideasync.ideasyncbackend.projectstatus.ProjectStatusRepository;
+import com.ideasync.ideasyncbackend.projectstatus.ProjectStatusService;
 import com.ideasync.ideasyncbackend.tag.Tag;
 import com.ideasync.ideasyncbackend.tag.TagRepository;
 import com.ideasync.ideasyncbackend.user.User;
@@ -21,7 +24,10 @@ import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -38,6 +44,9 @@ public class ProjectService {
     private final UserService userService;
     private final ApplicantService applicantService;
     private final CommentService commentService;
+    private final ProjectStatusService projectStatusService;
+    private static final Logger logger = LoggerFactory.getLogger(ProjectService.class);
+    private final ProjectStatusRepository projectStatusRepository;
 
 
     @Autowired
@@ -45,7 +54,14 @@ public class ProjectService {
                           ProjectRepository projectRepository,
                           UserRepository userRepository,
                           TagRepository tagRepository,
-                          ProjectImageRepository projectImageRepository, ArchiveRepository archiveRepository, ApplicantRepository applicantRepository, CommentRepository commentRepository, UserService userService, ApplicantService applicantService, CommentService commentService) {
+                          ProjectImageRepository projectImageRepository,
+                          ArchiveRepository archiveRepository,
+                          ApplicantRepository applicantRepository,
+                          CommentRepository commentRepository,
+                          UserService userService,
+                          @Lazy ApplicantService applicantService,
+                          CommentService commentService,
+                          @Lazy ProjectStatusService projectStatusService, ProjectStatusRepository projectStatusRepository) {
 
         this.vectorStore = vectorStore;
         this.projectRepository = projectRepository;
@@ -58,6 +74,8 @@ public class ProjectService {
         this.userService = userService;
         this.applicantService = applicantService;
         this.commentService = commentService;
+        this.projectStatusService = projectStatusService;
+        this.projectStatusRepository = projectStatusRepository;
     }
 
     public boolean isValidProjectData(ProjectRequest projectRequest) {
@@ -67,7 +85,6 @@ public class ProjectService {
         String requireSkills = projectRequest.getRequireSkills();
         String school = projectRequest.getSchool();
         int allowApplicantsNum = projectRequest.getAllowApplicantsNum();
-        int applicantCount = projectRequest.getApplicantCount();
 
         // if all data is valid
         // and the user is allowed to create project
@@ -77,8 +94,16 @@ public class ProjectService {
                 && (statusId != null)
                 && (school != null && !school.isEmpty())
                 && (requireSkills != null && !requireSkills.isEmpty())
-                && (allowApplicantsNum != 0)
-                && (applicantCount <= 0);
+                && (allowApplicantsNum != 0);
+    }
+
+    public List<ProjectResponse> getProjectsByUser(Long userId) {
+        List<Project> projects = projectRepository.findProjectsByUser(userRepository.findUserById(userId));
+        List<ProjectResponse> responses = new ArrayList<>();
+        for (Project project : projects) {
+            responses.add(setProjectResponse(project));
+        }
+        return responses;
     }
 
     public boolean checkProjectWithoutSameTitle(User user, String title) {
@@ -115,7 +140,6 @@ public class ProjectService {
                 project.getDescription(),
                 project.getSchool(),
                 project.getAllowApplicantsNum(),
-                project.getApplicantCount(),
                 project.isGraduationProject(),
                 project.getCreateAt(),
                 images,
@@ -166,7 +190,6 @@ public class ProjectService {
         project.setGraduationProject(projectRequest.getGraduationProject());
         project.setSchool(projectRequest.getSchool());
         project.setAllowApplicantsNum(projectRequest.getAllowApplicantsNum());
-        project.setApplicantCount(projectRequest.getApplicantCount());
         project.setRequireSkills(projectRequest.getRequireSkills());
 
         try {
@@ -273,4 +296,58 @@ public class ProjectService {
         Optional<Project> project = projectRepository.findById(id);
         return project.map(this::setProjectResponse).orElse(null);
     }
+
+    public List<ProjectResponse> getRelatedProjects(Long projectId) {
+        /* Prepare feature string to get recommendation */
+        StringBuilder s = new StringBuilder();
+        Project p = projectRepository.findProjectById(projectId);
+        for (Tag t: p.getTags()) {
+            s.append(t.getName());
+        }
+        s.append(p.getDescription());
+        List<Long> relatedProjectIds = projectStatusService.getRecommendProjectIds(s.toString());
+        // filter out the one with id equals to projectId
+        relatedProjectIds.remove(projectId);
+        List<ProjectResponse> responses = new ArrayList<>();
+        for (Long id: relatedProjectIds) {
+            responses.add(getProjectById(id));
+        }
+        return responses;
+    }
+
+    public ProjectResponse changeProjectStatus(Long projectId, Long changeToWhat, String nextOrPrevious) {
+        Project project = projectRepository.findProjectById(projectId);
+        if (nextOrPrevious.equals("next")) {
+            // check if applicants all reviewed
+            List<Applicant> applicants = applicantRepository.findApplicantsByProject(project);
+            for (Applicant app: applicants) {
+                if (app.getVerified() == 0) {
+                    return null;
+                }
+            }
+
+            int acceptedApplicantsNum = 0;
+            for (Applicant app: applicants) {
+                if (app.getVerified() == 1) {
+                    acceptedApplicantsNum++;
+                }
+            }
+            // check if allowApplicantsNum > acceptedApplicantsNum
+            int allowApplicantsNum = project.getAllowApplicantsNum();
+
+            if (allowApplicantsNum < acceptedApplicantsNum) {
+                return null;
+            }
+        }
+        try {
+            ProjectStatus statusChangeTo = projectStatusRepository.findStatusById(changeToWhat);
+            project.setProjectStatus(statusChangeTo);
+            projectRepository.save(project);
+        } catch (Exception e) {
+            logger.error("Error changing project status", e);
+            return null;
+        }
+        return setProjectResponse(project);
+    }
+
 }
