@@ -75,6 +75,10 @@ public class ApplicantService {
         Project project = projectRepository.findProjectById(projectId);
         Applicant applicant = new Applicant();
 
+        if (!user.isAllowProjectApply()) {
+            return "User is not allowed to apply";
+        }
+
         // if user is the host of project, not allow to apply
         if (Objects.equals(project.getUser().getId(), userId)) {
             return "User is the host of the project";
