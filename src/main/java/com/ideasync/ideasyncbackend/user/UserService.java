@@ -1,6 +1,8 @@
 package com.ideasync.ideasyncbackend.user;
 
-
+import com.google.common.base.Verify;
+import com.ideasync.ideasyncbackend.authority.jwt.JwtAuthService;
+import com.ideasync.ideasyncbackend.authority.jwt.SecurityConfig;
 import com.ideasync.ideasyncbackend.user.dto.UserResponse;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,9 +10,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.mail.javamail.JavaMailSender;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 /**
@@ -270,5 +270,24 @@ public class UserService {
       userResponses.add(getUserResponse(user));
     }
     return userResponses;
+  }
+
+  public String getToken(String userName, String password) {
+
+    Map<String, Object> reqDTO = new HashMap<>();
+    reqDTO.put("username", userName);
+    reqDTO.put("password", password);
+
+
+    JwtAuthService jwtAuthService = new JwtAuthService();
+
+    String token = jwtAuthService.auth(reqDTO);
+    return token;
+  }
+
+  public String verifyAuthority(){
+    SecurityConfig securityConfig = new SecurityConfig();
+    if(securityConfig.securityFilterChain()
+    }
   }
 }
