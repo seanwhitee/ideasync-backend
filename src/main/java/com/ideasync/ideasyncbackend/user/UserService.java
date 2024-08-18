@@ -1,6 +1,8 @@
 package com.ideasync.ideasyncbackend.user;
 
 
+import com.ideasync.ideasyncbackend.applicant.ApplicantRepository;
+import com.ideasync.ideasyncbackend.comment.CommentRepository;
 import com.ideasync.ideasyncbackend.user.dto.UserResponse;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +23,15 @@ public class UserService {
 
   private final UserRepository userRepository;
   private final JavaMailSender emailSender;
+  private final CommentRepository commentRepository;
+  private final ApplicantRepository applicantRepository;
 
   @Autowired
-  public UserService(UserRepository userRepository, JavaMailSender emailSender) {
+  public UserService(UserRepository userRepository, JavaMailSender emailSender, CommentRepository commentRepository, ApplicantRepository applicantRepository) {
     this.userRepository = userRepository;
     this.emailSender = emailSender;
+    this.commentRepository = commentRepository;
+    this.applicantRepository = applicantRepository;
   }
 
   /**
@@ -270,5 +276,14 @@ public class UserService {
       userResponses.add(getUserResponse(user));
     }
     return userResponses;
+  }
+
+  public int countUserComments(Long userId) {
+    return commentRepository.findCommentsByUser(userRepository.findUserById(userId)).size();
+
+  }
+
+  public int countAccept(Long userId) {
+    return applicantRepository.findApplicantsByUserAndVerified(userRepository.findUserById(userId), 1).size();
   }
 }

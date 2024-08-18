@@ -56,4 +56,14 @@ public class UserController {
   public List<UserResponse> getAllUsers() {
     return userService.getAllUsers();
   }
+
+  @GetMapping("/countUserComments")
+  public int countUserComments(@RequestParam Long userId) {
+    return  userService.countUserComments(userId);
+  }
+
+  @GetMapping("/countAccept")
+  public int countAccept(@RequestParam Long userId) {
+    return userService.countAccept(userId);
+  }
 }

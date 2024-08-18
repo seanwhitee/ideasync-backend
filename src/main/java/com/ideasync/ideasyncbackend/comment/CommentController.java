@@ -1,6 +1,7 @@
 package com.ideasync.ideasyncbackend.comment;
 
 import com.ideasync.ideasyncbackend.comment.dto.CommentChunk;
+import com.ideasync.ideasyncbackend.comment.dto.CommentResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,12 +17,12 @@ public class CommentController {
     }
 
     @PostMapping("/addReply")
-    public String addComment(@RequestParam Long userId, @RequestParam Long projectId, @RequestParam Long parentId, @RequestParam String text) {
+    public CommentResponse addComment(@RequestParam Long userId, @RequestParam Long projectId, @RequestParam Long parentId, @RequestParam String text) {
         return commentService.addReply(userId, projectId, parentId, text);
     }
 
     @PostMapping("/addComment")
-    public String addComment(@RequestParam Long userId, @RequestParam Long projectId, @RequestParam String text) {
+    public CommentChunk addComment(@RequestParam Long userId, @RequestParam Long projectId, @RequestParam String text) {
         return commentService.addComment(userId, projectId, text);
     }
 
