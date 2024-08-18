@@ -13,4 +13,5 @@ public interface ApplicantRepository extends JpaRepository<Applicant, Long> {
     Applicant findByProjectAndUser(Project project, User user);
     List<Applicant> findApplicantsByProject(Project project);
     List<Applicant> findApplicantsByUser(User user);
+    List<Applicant> findApplicantsByUserAndVerified(User user, int verified);
 }

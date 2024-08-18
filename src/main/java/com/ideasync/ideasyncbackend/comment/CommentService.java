@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CommentService {
@@ -31,81 +32,90 @@ public class CommentService {
         this.projectRepository = projectRepository;
     }
 
-    public String addReply(Long userId, Long projectId, Long parentId, String text) {
+    public CommentChunk setCommentChunkResponse(Comment comment) {
+        return new CommentChunk(
+                comment.getId(),
+                comment.getUser().getId(),
+                comment.getProject().getId(),
+                comment.getText(),
+                new ArrayList<>(),
+                comment.getUser().getAvatarUrl(),
+                comment.getUser().getNickName(),
+                comment.getCreateAt()
+        );
+    }
+
+    public CommentResponse setCommentResponse(Comment comment) {
+        return new CommentResponse(
+                comment.getId(),
+                comment.getText(),
+                comment.getUser().getId(),
+                comment.getProject().getId(),
+                comment.getParentId(),
+                comment.getUser().getAvatarUrl(),
+                comment.getUser().getNickName(),
+                comment.getCreateAt()
+        );
+    }
+
+    private Comment validateAndSetComment(Long userId, Long projectId, String text) {
+        User user = userRepository.findUserById(userId);
+        Project project = projectRepository.findProjectById(projectId);
+
+        if(user == null) {
+            return null;
+        }
+
+        if(project == null) {
+            return null;
+        }
+
+        Comment comment = new Comment();
+        comment.setText(text);
+        comment.setUser(user);
+        comment.setProject(project);
+        return  comment;
+    }
+
+    public CommentResponse addReply(Long userId, Long projectId, Long parentId, String text) {
         if (parentId != null){
             Comment parentComment = commentRepository.findCommentById(parentId);
             if (parentComment == null) {
-                return "Parent comment not found";
+                return null;
             }
         }
 
         // check parent project id is same as project id
         Comment parentComment = commentRepository.findCommentById(parentId);
         if (parentComment != null && !parentComment.getProject().getId().equals(projectId)) {
-            return "Parent comment not found";
+            return null;
         }
 
 
-        // only creator and mentor allow to comment
-        User user = userRepository.findUserById(userId);
-        Project project = projectRepository.findProjectById(projectId);
-
-        if(user == null) {
-            return "User not found";
-        }
-
-        if(project == null) {
-            return "Project not found";
-        }
-
-        if (user.getUserRole().getId() == 3) {
-            return "Only creator and mentor allow to reply";
-        }
-
-        Comment comment = new Comment();
-        comment.setText(text);
-        comment.setUser(user);
-        comment.setProject(project);
-        comment.setParentId(parentId);
+        Comment comment = validateAndSetComment(userId, projectId, text);
 
         try {
-            commentRepository.save(comment);
-            return "Reply added successfully";
+            Comment savedComment =  commentRepository.save(Optional.ofNullable(comment).orElseThrow());
+            return setCommentResponse(savedComment);
         } catch (Exception e) {
             logger.error("Failed to add reply", e);
-            return "Failed to add reply";
+            return null;
         }
 
     }
 
-    public String addComment(Long userId, Long projectId, String text) {
-        // only creator and mentor allow to comment
-        User user = userRepository.findUserById(userId);
-        Project project = projectRepository.findProjectById(projectId);
 
-        if(user == null) {
-            return "User not found";
-        }
+    public CommentChunk addComment(Long userId, Long projectId, String text) {
 
-        if(project == null) {
-            return "Project not found";
-        }
+        Comment comment = validateAndSetComment(userId, projectId, text);
 
-        if (user.getUserRole().getId() == 3) {
-            return "Only creator and mentor allow to comment";
-        }
-
-        Comment comment = new Comment();
-        comment.setText(text);
-        comment.setUser(user);
-        comment.setProject(project);
 
         try {
-            commentRepository.save(comment);
-            return "Comment added successfully";
+            Comment savedComment = commentRepository.save(Optional.ofNullable(comment).orElseThrow());
+            return setCommentChunkResponse(savedComment);
         } catch (Exception e) {
             logger.error("Failed to add comment", e);
-            return "Failed to add comment";
+            return null;
         }
     }
 
