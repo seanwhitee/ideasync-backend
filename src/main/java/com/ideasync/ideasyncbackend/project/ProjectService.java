@@ -294,7 +294,8 @@ public class ProjectService {
 
     public ProjectResponse getProjectById(Long id) {
         Optional<Project> project = projectRepository.findById(id);
-        return project.map(this::setProjectResponse).orElse(null);
+        ProjectResponse rs = project.map(this::setProjectResponse).orElse(null);
+        return rs;
     }
 
     public List<ProjectResponse> getRelatedProjects(Long projectId) {

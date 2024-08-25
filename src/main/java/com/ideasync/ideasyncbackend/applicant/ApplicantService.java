@@ -55,7 +55,8 @@ public class ApplicantService {
             UserResponse userRes = userService.getUserResponse(app.getUser());
             int applicantStatus = app.getVerified();
             if ((projectStatus.getStatus().equals("member_recruiting") && app.getUser().getUserRole().getRoleName().equals("creator")
-            || (projectStatus.getStatus().equals("mentor_recruiting") && app.getUser().getUserRole().getRoleName().equals("mentor")))) {
+            || (projectStatus.getStatus().equals("mentor_recruiting") && app.getUser().getUserRole().getRoleName().equals("mentor"))
+            || (projectStatus.getStatus().equals("complete")))) {
                 applicantResponses.add(new ApplicantResponse(userRes, applicantStatus));
             }
         }
