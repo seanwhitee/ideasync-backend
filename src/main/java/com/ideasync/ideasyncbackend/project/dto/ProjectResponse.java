@@ -6,11 +6,12 @@ import com.ideasync.ideasyncbackend.comment.dto.CommentChunk;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.UUID;
 
 public class ProjectResponse {
-    private Long id;
+    private UUID id;
     private UserResponse hostUser;
-    private Long statusId;
+    private String status;
     private String title;
     private String description;
     private String school;
@@ -23,9 +24,9 @@ public class ProjectResponse {
     private List<ApplicantResponse> applicants;
     private List<CommentChunk> commentChunks;
 
-    public ProjectResponse(Long id,
+    public ProjectResponse(UUID id,
                            UserResponse hostUser,
-                           Long statusId,
+                           String status,
                            String title,
                            String description,
                            String school,
@@ -39,7 +40,7 @@ public class ProjectResponse {
                            List<CommentChunk> commentChunks) {
         this.id = id;
         this.hostUser = hostUser;
-        this.statusId = statusId;
+        this.status = status;
         this.title = title;
         this.description = description;
         this.school = school;
@@ -109,11 +110,11 @@ public class ProjectResponse {
         return title;
     }
 
-    public Long getStatusId() {
-        return statusId;
+    public String getStatus() {
+        return status;
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
@@ -125,12 +126,12 @@ public class ProjectResponse {
         return tags;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
-    public void setStatusId(Long statusId) {
-        this.statusId = statusId;
+    public void setStatusId(String status) {
+        this.status = status;
     }
 
     public void setTitle(String title) {

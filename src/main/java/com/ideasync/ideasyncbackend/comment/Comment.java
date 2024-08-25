@@ -5,16 +5,19 @@ import jakarta.persistence.*;
 import com.ideasync.ideasyncbackend.project.Project;
 import com.ideasync.ideasyncbackend.user.User;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 
 import java.sql.Timestamp;
+import java.sql.Types;
+import java.util.UUID;
 
 @Entity
 @Table(name = "comment")
 public class Comment {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  @Id @GeneratedValue
+  @JdbcTypeCode(Types.VARCHAR)
+  private UUID id;
 
   @CreationTimestamp
   @Column(name = "createAt", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
@@ -32,11 +35,11 @@ public class Comment {
   private String text;
 
   @Column(name = "parentId")
-  private Long parentId;
+  private UUID parentId;
 
   // Constructors, getters, and setters
 
-  public Long getId() {
+  public UUID getId() {
     return id;
   }
 
@@ -56,11 +59,11 @@ public class Comment {
     return text;
   }
 
-  public Long getParentId() {
+  public UUID getParentId() {
     return parentId;
   }
 
-  public void setId(Long id) {
+  public void setId(UUID id) {
     this.id = id;
   }
 
@@ -80,7 +83,7 @@ public class Comment {
     this.text = text;
   }
 
-  public void setParentId(Long parentId) {
+  public void setParentId(UUID parentId) {
       this.parentId = parentId;
   }
 }

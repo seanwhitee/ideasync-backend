@@ -7,17 +7,20 @@ import com.ideasync.ideasyncbackend.tag.Tag;
 import com.ideasync.ideasyncbackend.user.User;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "project")
 public class Project {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  @Id @GeneratedValue
+  @JdbcTypeCode(Types.VARCHAR)
+  private UUID id;
 
   @ManyToOne
   @JoinColumn(name = "hostUserId", nullable = false)
@@ -77,7 +80,7 @@ public class Project {
     this.title = title;
   }
 
-  public Long getId() {
+  public UUID getId() {
     return id;
   }
 
@@ -125,7 +128,7 @@ public class Project {
     return applicants;
   }
 
-  public void setId(Long id) {
+  public void setId(UUID id) {
     this.id = id;
   }
 

@@ -7,17 +7,20 @@ import com.ideasync.ideasyncbackend.userrole.UserRole;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 
 import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "user")
 public class User {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  @Id @GeneratedValue
+  @JdbcTypeCode(Types.VARCHAR)
+  private UUID id;
 
   @Column(name = "userName", nullable = false, unique = true)
   private String userName;
@@ -72,7 +75,7 @@ public class User {
 
   // Constructors, getters, and setters
 
-  public Long getId() {
+  public UUID getId() {
     return id;
   }
 
@@ -136,7 +139,7 @@ public class User {
     return applicants;
   }
 
-  public void setId(Long id) {
+  public void setId(UUID id) {
     this.id = id;
   }
 

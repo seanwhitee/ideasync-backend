@@ -5,6 +5,7 @@ import com.ideasync.ideasyncbackend.project.dto.ProjectResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @CrossOrigin
 @RestController
@@ -27,29 +28,29 @@ public class ProjectController {
     }
 
     @GetMapping("/getProjectsByUser")
-    public List<ProjectResponse> getProjectsByUser(@RequestParam Long userId) {
+    public List<ProjectResponse> getProjectsByUser(@RequestParam UUID userId) {
         return projectService.getProjectsByUser(userId);
     }
 
     @DeleteMapping("/delete")
-    public String deleteProject(@RequestParam Long id) {
+    public String deleteProject(@RequestParam UUID id) {
         return projectService.deleteProjectById(id);
     }
 
 
     @GetMapping("/getProjectById")
-    public ProjectResponse getProjectById(@RequestParam Long id) {
+    public ProjectResponse getProjectById(@RequestParam UUID id) {
         return projectService.getProjectById(id);
     }
 
     @GetMapping("/getRelatedProjects")
-    public List<ProjectResponse> getRelatedProjects(@RequestParam Long projectId) {
+    public List<ProjectResponse> getRelatedProjects(@RequestParam UUID projectId) {
         return projectService.getRelatedProjects(projectId);
     }
 
     @PostMapping("/changeProjectStatus")
-    public ProjectResponse changeProjectStatus(@RequestParam Long projectId,
-                                               @RequestParam Long status,
+    public ProjectResponse changeProjectStatus(@RequestParam UUID projectId,
+                                               @RequestParam String status,
                                                @RequestParam String nextOrPrevious) {
         return projectService.changeProjectStatus(projectId, status, nextOrPrevious);
     }

@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 
 @Service
@@ -32,7 +33,7 @@ public class ArchiveService {
         this.userRepository = userRepository;
         this.projectService = projectService;
     }
-    public String deleteArchive(Long projectId, Long userId) {
+    public String deleteArchive(UUID projectId, UUID userId) {
         Project project = projectRepository.findProjectById(projectId);
         if (project == null) {
             return "Project not found";
@@ -53,12 +54,12 @@ public class ArchiveService {
             return "Error deleting archive";
         }
     }
-    public List<ProjectResponse> getArchives(Long userId) {
+    public List<ProjectResponse> getArchives(UUID userId) {
         List<Archive> archives = archiveRepository.findArchivesByUserId(userId);
         List<ProjectResponse> projectResponses = new ArrayList<>();
         for (Archive archive : archives) {
             Project project = archive.getProject();
-            if (project.getProjectStatus().getId() != 3) {
+            if (!project.getProjectStatus().getStatus().equals("complete")) {
                 projectResponses.add(projectService.setProjectResponse(project));
             }
         }
@@ -66,7 +67,7 @@ public class ArchiveService {
         return projectResponses;
 
     }
-    public String addArchive(Long projectId, Long userId) {
+    public String addArchive(UUID projectId, UUID userId) {
         // prepare user and project
         Project project = projectRepository.findProjectById(projectId);
         if (project == null) {

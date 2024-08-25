@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 @Service
 public class ApplicantService {
@@ -36,16 +37,16 @@ public class ApplicantService {
         this.userService = userService;
         this.projectService = projectService;
     }
-    public List<Long> getApplicantIds(Long projectId) {
+    public List<UUID> getApplicantIds(UUID projectId) {
         List<Applicant> applicants =  applicantRepository.findByProjectId(projectId);
-        List<Long> applicantUserIds = new ArrayList<>();
+        List<UUID> applicantUserIds = new ArrayList<>();
         for (Applicant applicant : applicants) {
             applicantUserIds.add(applicant.getUser().getId());
         }
         return applicantUserIds;
     }
 
-    public List<ApplicantResponse> getApplicants(Long projectId) {
+    public List<ApplicantResponse> getApplicants(UUID projectId) {
         Project p = projectRepository.findProjectById(projectId);
         ProjectStatus projectStatus = p.getProjectStatus();
         List<Applicant> applicants = applicantRepository.findByProjectId(projectId);
@@ -64,9 +65,9 @@ public class ApplicantService {
         return  applicantResponses;
     }
 
-    public String addApplicant(Long projectId, Long userId) {
+    public String addApplicant(UUID projectId, UUID userId) {
         // check if user is already an applicant
-        List<Long> applicantUserIds = getApplicantIds(projectId);
+        List<UUID> applicantUserIds = getApplicantIds(projectId);
         if (applicantUserIds.contains(userId)) {
             return "User is already an applicant";
         }
@@ -97,7 +98,7 @@ public class ApplicantService {
         }
     }
 
-    public String deleteApplicant(Long projectId, Long userId) {
+    public String deleteApplicant(UUID projectId, UUID userId) {
         // check user and project exist
         User user = userRepository.findUserById(userId);
         Project project = projectRepository.findProjectById(projectId);
@@ -111,7 +112,7 @@ public class ApplicantService {
         }
 
         // check if user is an applicant
-        List<Long> applicantUserIds = getApplicantIds(projectId);
+        List<UUID> applicantUserIds = getApplicantIds(projectId);
         if (!applicantUserIds.contains(userId)) {
             return "User is not an applicant";
         }
@@ -128,7 +129,7 @@ public class ApplicantService {
 
     }
 
-    public ApplicantResponse rejectApplicant(Long projectId, Long userId) {
+    public ApplicantResponse rejectApplicant(UUID projectId, UUID userId) {
         Project p = projectRepository.findProjectById(projectId);
         User u = userRepository.findUserById(userId);
         Applicant targetRecord = applicantRepository
@@ -143,7 +144,7 @@ public class ApplicantService {
         }
     }
 
-    public ApplicantResponse acceptApplicant(Long projectId, Long userId) {
+    public ApplicantResponse acceptApplicant(UUID projectId, UUID userId) {
         Project p = projectRepository.findProjectById(projectId);
         User u = userRepository.findUserById(userId);
         Applicant targetRecord = applicantRepository
@@ -158,7 +159,7 @@ public class ApplicantService {
         }
     }
 
-    public List<ProjectResponse> getProjectAppliedByUser(Long userId) {
+    public List<ProjectResponse> getProjectAppliedByUser(UUID userId) {
         User u = userRepository.findUserById(userId);
         List<Applicant> applicants = applicantRepository.findApplicantsByUser(u);
         

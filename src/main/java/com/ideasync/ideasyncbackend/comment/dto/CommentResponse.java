@@ -1,18 +1,19 @@
 package com.ideasync.ideasyncbackend.comment.dto;
 
 import java.sql.Timestamp;
+import java.util.UUID;
 
 public class CommentResponse {
-    private Long id;
+    private UUID id;
     private String text;
-    private Long userId;
-    private Long projectId;
-    private Long parentId;
+    private UUID userId;
+    private UUID projectId;
+    private UUID parentId;
     private String avatarURL;
     private String nickName;
     private Timestamp createAt;
 
-    public CommentResponse(Long id, String text, Long userId, Long projectId, Long parentId, String avatarURL, String nickName, Timestamp createAt) {
+    public CommentResponse(UUID id, String text, UUID userId, UUID projectId, UUID parentId, String avatarURL, String nickName, Timestamp createAt) {
         this.id = id;
         this.text = text;
         this.userId = userId;
@@ -49,11 +50,11 @@ public class CommentResponse {
 
 
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -65,27 +66,27 @@ public class CommentResponse {
         this.text = text;
     }
 
-    public Long getUserId() {
+    public UUID getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(UUID userId) {
         this.userId = userId;
     }
 
-    public Long getProjectId() {
+    public UUID getProjectId() {
         return projectId;
     }
 
-    public void setProjectId(Long projectId) {
+    public void setProjectId(UUID projectId) {
         this.projectId = projectId;
     }
 
-    public Long getParentId() {
+    public UUID getParentId() {
         return parentId;
     }
 
-    public void setParentId(Long parentId) {
+    public void setParentId(UUID parentId) {
         this.parentId = parentId;
     }
 }
