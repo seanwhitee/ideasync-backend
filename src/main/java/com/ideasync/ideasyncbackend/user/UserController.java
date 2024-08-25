@@ -56,14 +56,4 @@ public class UserController {
   public List<UserResponse> getAllUsers() {
     return userService.getAllUsers();
   }
-
-  @GetMapping("getToken")
-  public String getToken(@RequestParam String username, @RequestParam String password){
-    return userService.getToken(username,password);
-  }
-
-  @GetMapping("verifyAuthority")
-  public String verifyAuthority(){
-    return userService.verifyAuthority();
-  }
 }
