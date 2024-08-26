@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class CommentService {
@@ -58,7 +59,7 @@ public class CommentService {
         );
     }
 
-    private Comment validateAndSetComment(Long userId, Long projectId, String text) {
+    private Comment validateAndSetComment(UUID userId, UUID projectId, UUID parentId, String text) {
         User user = userRepository.findUserById(userId);
         Project project = projectRepository.findProjectById(projectId);
 
@@ -74,13 +75,15 @@ public class CommentService {
         comment.setText(text);
         comment.setUser(user);
         comment.setProject(project);
+        comment.setParentId(parentId);
         return  comment;
     }
 
-    public CommentResponse addReply(Long userId, Long projectId, Long parentId, String text) {
+    public CommentResponse addReply(UUID userId, UUID projectId, UUID parentId, String text) {
         if (parentId != null){
             Comment parentComment = commentRepository.findCommentById(parentId);
             if (parentComment == null) {
+                logger.info("Parent comment not found");
                 return null;
             }
         }
@@ -88,11 +91,12 @@ public class CommentService {
         // check parent project id is same as project id
         Comment parentComment = commentRepository.findCommentById(parentId);
         if (parentComment != null && !parentComment.getProject().getId().equals(projectId)) {
+            logger.info("Parent project id is not same as project id");
             return null;
         }
 
 
-        Comment comment = validateAndSetComment(userId, projectId, text);
+        Comment comment = validateAndSetComment(userId, projectId, parentId, text);
 
         try {
             Comment savedComment =  commentRepository.save(Optional.ofNullable(comment).orElseThrow());
@@ -105,9 +109,9 @@ public class CommentService {
     }
 
 
-    public CommentChunk addComment(Long userId, Long projectId, String text) {
+    public CommentChunk addComment(UUID userId, UUID projectId, String text) {
 
-        Comment comment = validateAndSetComment(userId, projectId, text);
+        Comment comment = validateAndSetComment(userId, projectId, null, text);
 
 
         try {
@@ -119,7 +123,7 @@ public class CommentService {
         }
     }
 
-    public List<CommentChunk> getAllCommentChunks(Long projectId) {
+    public List<CommentChunk> getAllCommentChunks(UUID projectId) {
         List<Comment> comments = commentRepository.findCommentsByProjectId(projectId);
         List<CommentChunk> commentChunks = new ArrayList<>();
 

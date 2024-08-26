@@ -3,8 +3,13 @@ package com.ideasync.ideasyncbackend.user;
 
 import com.ideasync.ideasyncbackend.applicant.ApplicantRepository;
 import com.ideasync.ideasyncbackend.comment.CommentRepository;
+import com.ideasync.ideasyncbackend.user.dto.RegisterRequest;
 import com.ideasync.ideasyncbackend.user.dto.UserResponse;
+import com.ideasync.ideasyncbackend.userrole.UserRole;
+import com.ideasync.ideasyncbackend.userrole.UserRoleRepository;
 import jakarta.mail.internet.MimeMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -13,6 +18,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 
 /**
@@ -25,13 +31,16 @@ public class UserService {
   private final JavaMailSender emailSender;
   private final CommentRepository commentRepository;
   private final ApplicantRepository applicantRepository;
+  private final UserRoleRepository userRoleRepository;
+  private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
   @Autowired
-  public UserService(UserRepository userRepository, JavaMailSender emailSender, CommentRepository commentRepository, ApplicantRepository applicantRepository) {
+  public UserService(UserRepository userRepository, JavaMailSender emailSender, CommentRepository commentRepository, ApplicantRepository applicantRepository, UserRoleRepository userRoleRepository) {
     this.userRepository = userRepository;
     this.emailSender = emailSender;
     this.commentRepository = commentRepository;
     this.applicantRepository = applicantRepository;
+    this.userRoleRepository = userRoleRepository;
   }
 
   /**
@@ -109,17 +118,35 @@ public class UserService {
   /**
    * Method to save user data.
    *
-   * @param user user data
+   * @param userReq user request data
    * @return String
    */
-  public String saveUserData(User user) {
+  public String saveUserData(RegisterRequest userReq) {
+    UserRole userRole = userRoleRepository.findUserRoleByRoleName(userReq.getRoleName());
+
+    User user = new User();
+    user.setUserName(userReq.getUserName());
+    user.setPassword(userReq.getPassword());
+    user.setNickName(userReq.getNickName());
+    user.setProfileDescription(userReq.getProfileDescription());
+    user.setUserRole(userRole);
+    user.setFirstName(userReq.getFirstName());
+    user.setLastName(userReq.getLastName());
+    user.setEmail(userReq.getEmail());
+    user.setAvatarUrl(userReq.getAvatarUrl());
+    user.setAllowProjectApply(userReq.isAllowProjectApply());
+    user.setAllowProjectCreate(userReq.isAllowProjectCreate());
+    user.setRoleVerified(userReq.isRoleVerified());
+
     try {
       userRepository.save(user);
     } catch (Exception e) {
+      logger.error("User data saving failed", e);
       return "User data saving failed";
     }
     return "User data saved successfully";
   }
+
 
   /**
    * Method to validate user data.
@@ -231,7 +258,7 @@ public class UserService {
    * @param id user id
    * @return UserResponse
    */
-  public UserResponse getUser(Long id) {
+  public UserResponse getUser(UUID id) {
     User userData = userRepository.findById(id).orElse(null);
     if (userData == null) {
       return null;
@@ -245,7 +272,7 @@ public class UserService {
    * @param id id of user
    * @return success message
    */
-  public String deleteUser(Long id) {
+  public String deleteUser(UUID id) {
     Optional<User> user = userRepository.findById(id);
 
     if (user.isPresent()) {
@@ -259,7 +286,7 @@ public class UserService {
     return "User not found";
   }
 
-  public String updateRoleStatus(Long id, boolean status) {
+  public String updateRoleStatus(UUID id, boolean status) {
     Optional<User> user = userRepository.findById(id);
     if (user.isPresent()) {
       user.get().setRoleVerified(status);
@@ -278,12 +305,12 @@ public class UserService {
     return userResponses;
   }
 
-  public int countUserComments(Long userId) {
+  public int countUserComments(UUID userId) {
     return commentRepository.findCommentsByUser(userRepository.findUserById(userId)).size();
 
   }
 
-  public int countAccept(Long userId) {
+  public int countAccept(UUID userId) {
     return applicantRepository.findApplicantsByUserAndVerified(userRepository.findUserById(userId), 1).size();
   }
 }

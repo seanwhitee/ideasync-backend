@@ -6,10 +6,11 @@ import org.springframework.stereotype.Repository;
 
 import com.ideasync.ideasyncbackend.user.User;
 import java.util.List;
+import java.util.UUID;
 
 @Repository
-public interface ProjectRepository extends JpaRepository<Project, Long>{
-    Project findProjectById(long id);
+public interface ProjectRepository extends JpaRepository<Project, UUID>{
+    Project findProjectById(UUID id);
     Project findProjectByUser(User user);
     List<Project> findProjectsByUser(User user);
     Project findBySchool(String school);

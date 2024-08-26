@@ -2,18 +2,19 @@ package com.ideasync.ideasyncbackend.comment.dto;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.UUID;
 
 public class CommentChunk {
-    private Long id;
-    private Long userId;
-    private Long projectId;
+    private UUID id;
+    private UUID userId;
+    private UUID projectId;
     private String text;
     private List<CommentResponse> children;
     private String avatarURL;
     private String nickName;
     private Timestamp createAt;
 
-    public CommentChunk(Long id, Long userId, Long projectId, String text, List<CommentResponse> children, String avatarURL, String nickName,  Timestamp createAt) {
+    public CommentChunk(UUID id, UUID userId, UUID projectId, String text, List<CommentResponse> children, String avatarURL, String nickName, Timestamp createAt) {
         this.id = id;
         this.userId = userId;
         this.projectId = projectId;
@@ -48,7 +49,7 @@ public class CommentChunk {
         this.createAt = createAt;
     }
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
@@ -60,23 +61,23 @@ public class CommentChunk {
         this.text = text;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
-    public Long getUserId() {
+    public UUID getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(UUID userId) {
         this.userId = userId;
     }
 
-    public Long getProjectId() {
+    public UUID getProjectId() {
         return projectId;
     }
 
-    public void setProjectId(Long projectId) {
+    public void setProjectId(UUID projectId) {
         this.projectId = projectId;
     }
 

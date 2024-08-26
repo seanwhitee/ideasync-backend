@@ -2,16 +2,19 @@ package com.ideasync.ideasyncbackend.userrole;
 
 import jakarta.persistence.*;
 import com.ideasync.ideasyncbackend.user.User;
+import org.hibernate.annotations.JdbcTypeCode;
 
+import java.sql.Types;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "userrole")
 public class UserRole {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  @Id @GeneratedValue
+  @JdbcTypeCode(Types.VARCHAR)
+  private UUID id;
 
   @OneToMany(mappedBy = "userRole", cascade = {CascadeType.MERGE})
   private List<User> users;
@@ -21,7 +24,7 @@ public class UserRole {
 
   // Constructors, getters, and setters
 
-  public Long getId() {
+  public UUID getId() {
     return id;
   }
 
@@ -33,7 +36,7 @@ public class UserRole {
     return roleName;
   }
 
-  public void setId(Long id) {
+  public void setId(UUID id) {
     this.id = id;
   }
 

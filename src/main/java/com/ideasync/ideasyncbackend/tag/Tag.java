@@ -3,16 +3,19 @@ import jakarta.persistence.*;
 
 import com.ideasync.ideasyncbackend.project.Project;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 
 import java.sql.Timestamp;
+import java.sql.Types;
+import java.util.UUID;
 
 @Entity
 @Table(name = "tag")
 public class Tag {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  @Id @GeneratedValue
+  @JdbcTypeCode(Types.VARCHAR)
+  private UUID id;
 
   @CreationTimestamp
   @Column(name = "createAt", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
@@ -27,7 +30,7 @@ public class Tag {
 
   // Constructors, getters, and setters
 
-  public Long getId() {
+  public UUID getId() {
     return id;
   }
 
@@ -47,7 +50,7 @@ public class Tag {
     this.createAt = createAt;
   }
 
-  public void setId(Long id) {
+  public void setId(UUID id) {
     this.id = id;
   }
 

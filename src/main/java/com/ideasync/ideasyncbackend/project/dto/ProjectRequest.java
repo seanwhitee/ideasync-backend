@@ -2,12 +2,13 @@ package com.ideasync.ideasyncbackend.project.dto;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.UUID;
 
 public class ProjectRequest {
-  private Long hostId;
+  private UUID hostId;
   private String title;
   private String description;
-  private Long statusId;
+  private String status;
   private String requireSkills;
   private boolean isGraduationProject;
   private String school;
@@ -17,10 +18,10 @@ public class ProjectRequest {
   private List<String> tags;
 
   // constructor
-  public ProjectRequest(Long hostId,
+  public ProjectRequest(UUID hostId,
                         String title,
                         String description,
-                        Long statusId,
+                        String status,
                         boolean isGraduationProject,
                         String school,
                         int allowApplicantsNum,
@@ -31,7 +32,7 @@ public class ProjectRequest {
     this.hostId = hostId;
     this.title = title;
     this.description = description;
-    this.statusId = statusId;
+    this.status = status;
     this.isGraduationProject = isGraduationProject;
     this.school = school;
     this.allowApplicantsNum = allowApplicantsNum;
@@ -49,7 +50,7 @@ public class ProjectRequest {
       this.requireSkills = requireSkills;
   }
 
-  public Long getHostId() {
+  public UUID getHostId() {
     return hostId;
   }
 
@@ -61,8 +62,8 @@ public class ProjectRequest {
     return description;
   }
 
-  public Long getStatusId() {
-    return statusId;
+  public String getStatus() {
+    return status;
   }
 
   public boolean getGraduationProject() {
@@ -89,7 +90,7 @@ public class ProjectRequest {
     return tags;
   }
 
-  public void setHostId(Long hostId) {
+  public void setHostId(UUID hostId) {
     this.hostId = hostId;
   }
 
@@ -101,8 +102,8 @@ public class ProjectRequest {
     this.description = description;
   }
 
-  public void setStatusId(Long statusId) {
-    this.statusId = statusId;
+  public void setStatus(String status) {
+    this.status = status;
   }
 
   public void setGraduationProject(boolean isGraduationProject) {

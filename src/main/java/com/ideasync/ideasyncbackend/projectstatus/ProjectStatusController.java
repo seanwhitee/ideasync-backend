@@ -4,6 +4,7 @@ import com.ideasync.ideasyncbackend.project.dto.ProjectResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @CrossOrigin
 @RestController
@@ -16,7 +17,7 @@ public class ProjectStatusController {
     }
 
     @GetMapping("/getRecommendProjectsByStatus")
-    public List<ProjectResponse> getRecommendProjectsByStatus(@RequestParam String status, @RequestParam Long userId) {
+    public List<ProjectResponse> getRecommendProjectsByStatus(@RequestParam String status, @RequestParam UUID userId) {
         return projectStatusService.getRecommendProjectsByStatus(status, userId);
     }
 }
