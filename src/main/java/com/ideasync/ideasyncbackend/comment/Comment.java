@@ -35,6 +35,7 @@ public class Comment {
   private String text;
 
   @Column(name = "parentId")
+  @JdbcTypeCode(Types.VARCHAR)
   private UUID parentId;
 
   // Constructors, getters, and setters

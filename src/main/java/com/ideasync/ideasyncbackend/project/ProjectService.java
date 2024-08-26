@@ -318,7 +318,9 @@ public class ProjectService {
             // check if applicants all reviewed
             List<Applicant> applicants = applicantRepository.findApplicantsByProject(project);
             for (Applicant app: applicants) {
-                if (app.getVerified() == 0) {
+                if (app.getVerified() == 0
+                        && (project.getProjectStatus().getStatus().equals("member_recruiting") && app.getUser().getUserRole().getRoleName().equals("creator"))
+                && (project.getProjectStatus().getStatus().equals("mentor_recruiting") && app.getUser().getUserRole().getRoleName().equals("mentor"))) {
                     return null;
                 }
             }

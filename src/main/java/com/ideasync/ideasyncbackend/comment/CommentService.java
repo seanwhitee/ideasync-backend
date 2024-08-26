@@ -59,7 +59,7 @@ public class CommentService {
         );
     }
 
-    private Comment validateAndSetComment(UUID userId, UUID projectId, String text) {
+    private Comment validateAndSetComment(UUID userId, UUID projectId, UUID parentId, String text) {
         User user = userRepository.findUserById(userId);
         Project project = projectRepository.findProjectById(projectId);
 
@@ -75,6 +75,7 @@ public class CommentService {
         comment.setText(text);
         comment.setUser(user);
         comment.setProject(project);
+        comment.setParentId(parentId);
         return  comment;
     }
 
@@ -95,7 +96,7 @@ public class CommentService {
         }
 
 
-        Comment comment = validateAndSetComment(userId, projectId, text);
+        Comment comment = validateAndSetComment(userId, projectId, parentId, text);
 
         try {
             Comment savedComment =  commentRepository.save(Optional.ofNullable(comment).orElseThrow());
@@ -110,7 +111,7 @@ public class CommentService {
 
     public CommentChunk addComment(UUID userId, UUID projectId, String text) {
 
-        Comment comment = validateAndSetComment(userId, projectId, text);
+        Comment comment = validateAndSetComment(userId, projectId, null, text);
 
 
         try {
