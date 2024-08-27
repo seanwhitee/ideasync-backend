@@ -10,16 +10,26 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/v1/authorization")
-@CrossOrigin
 public class AuthorizationController {
+    private final AuthorizationService authorizationService;
+    public AuthorizationController(AuthorizationService authorizationService) {
+        this.authorizationService = authorizationService;
+    }
+
     @GetMapping("/token")
     public Token getAccessToken(JwtAuthenticationToken jwtToken) {
         return new Token(
                 jwtToken.getToken(),
                 jwtToken.getAuthorities()
         );
+    }
+
+    @GetMapping("/generateToken")
+    public String getToken() throws Exception {
+        return authorizationService.generateToken();
     }
     public record Token(Jwt token, Collection<GrantedAuthority> authorities) {}
 }
