@@ -4,6 +4,7 @@ package com.ideasync.ideasyncbackend.user;
 import com.ideasync.ideasyncbackend.applicant.ApplicantRepository;
 import com.ideasync.ideasyncbackend.comment.CommentRepository;
 import com.ideasync.ideasyncbackend.user.dto.RegisterRequest;
+
 import com.ideasync.ideasyncbackend.user.dto.UserResponse;
 import com.ideasync.ideasyncbackend.userrole.UserRole;
 import com.ideasync.ideasyncbackend.userrole.UserRoleRepository;
@@ -15,10 +16,12 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.mail.javamail.JavaMailSender;
 
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
 
 
 /**
