@@ -6,11 +6,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
-public interface ApplicantRepository extends JpaRepository<Applicant, Long> {
-    List<Applicant> findByProjectId(Long projectId);
+public interface ApplicantRepository extends JpaRepository<Applicant, UUID> {
+    List<Applicant> findByProjectId(UUID projectId);
     Applicant findByProjectAndUser(Project project, User user);
     List<Applicant> findApplicantsByProject(Project project);
     List<Applicant> findApplicantsByUser(User user);
+    List<Applicant> findApplicantsByUserAndVerified(User user, int verified);
 }

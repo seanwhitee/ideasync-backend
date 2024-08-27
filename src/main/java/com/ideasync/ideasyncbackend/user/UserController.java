@@ -1,10 +1,12 @@
 package com.ideasync.ideasyncbackend.user;
 
+import com.ideasync.ideasyncbackend.user.dto.RegisterRequest;
 import com.ideasync.ideasyncbackend.user.dto.UserResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @CrossOrigin
 @RestController
@@ -23,7 +25,7 @@ public class UserController {
     return userService.sendPassCodeEmail(env.get("COMPANY_EMAIL"), email, passCode);
   }
   @DeleteMapping("/deleteUser")
-  public String deleteUser(@RequestParam Long id) {
+  public String deleteUser(@RequestParam UUID id) {
     return userService.deleteUser(id);
   }
 
@@ -33,12 +35,13 @@ public class UserController {
   }
 
   @PostMapping("/saveUserData")
-  public String saveUserData(@RequestBody User user) {
-    return userService.saveUserData(user);
+  public String saveUserData(@RequestBody RegisterRequest userRequest) {
+
+    return userService.saveUserData(userRequest);
   }
 
   @GetMapping("/{id}")
-  public UserResponse getUser(@PathVariable Long id) {
+  public UserResponse getUser(@PathVariable UUID id) {
     return userService.getUser(id);
   }
 
@@ -48,12 +51,22 @@ public class UserController {
   }
 
   @PatchMapping("/updateRoleStatus")
-  public String updateRoleStatus(@RequestParam Long id, @RequestParam boolean status) {
+  public String updateRoleStatus(@RequestParam UUID id, @RequestParam boolean status) {
     return userService.updateRoleStatus(id, status);
   }
 
   @GetMapping("/getAllUsers")
   public List<UserResponse> getAllUsers() {
     return userService.getAllUsers();
+  }
+
+  @GetMapping("/countUserComments")
+  public int countUserComments(@RequestParam UUID userId) {
+    return  userService.countUserComments(userId);
+  }
+
+  @GetMapping("/countAccept")
+  public int countAccept(@RequestParam UUID userId) {
+    return userService.countAccept(userId);
   }
 }

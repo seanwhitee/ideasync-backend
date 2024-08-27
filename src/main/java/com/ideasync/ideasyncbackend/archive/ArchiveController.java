@@ -4,6 +4,7 @@ import com.ideasync.ideasyncbackend.project.dto.ProjectResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @CrossOrigin
 @RestController
@@ -16,17 +17,17 @@ public class ArchiveController {
     }
 
     @GetMapping("/getArchives")
-    public List<ProjectResponse> getArchives(@RequestParam Long userId) {
+    public List<ProjectResponse> getArchives(@RequestParam UUID userId) {
         return archiveService.getArchives(userId);
     }
 
     @PostMapping("/addArchive")
-    public String addArchive(@RequestParam Long projectId, @RequestParam Long userId) {
+    public String addArchive(@RequestParam UUID projectId, @RequestParam UUID userId) {
         return archiveService.addArchive(projectId, userId);
     }
 
     @DeleteMapping("/deleteArchive")
-    public String deleteArchive(@RequestParam Long projectId, @RequestParam Long userId) {
+    public String deleteArchive(@RequestParam UUID projectId, @RequestParam UUID userId) {
         return archiveService.deleteArchive(projectId, userId);
     }
 }

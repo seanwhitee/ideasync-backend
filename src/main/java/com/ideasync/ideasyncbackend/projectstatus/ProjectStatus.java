@@ -2,16 +2,19 @@ package com.ideasync.ideasyncbackend.projectstatus;
 
 import com.ideasync.ideasyncbackend.project.Project;
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
 
+import java.sql.Types;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "projectstatus")
 public class ProjectStatus {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  @Id @GeneratedValue
+  @JdbcTypeCode(Types.VARCHAR)
+  private UUID id;
 
   @Column(name = "status", nullable = false)
   private String status;
@@ -20,7 +23,7 @@ public class ProjectStatus {
   private List<Project> projects;
   // Constructors, getters, and setters
 
-  public Long getId() {
+  public UUID getId() {
     return id;
   }
 
@@ -32,7 +35,7 @@ public class ProjectStatus {
     return projects;
   }
 
-  public void setId(Long id) {
+  public void setId(UUID id) {
     this.id = id;
   }
 

@@ -14,10 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import com.ideasync.ideasyncbackend.project.Project;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class ProjectStatusService {
@@ -27,6 +24,7 @@ public class ProjectStatusService {
     private final PineconeVectorStore vectorStore;
     private final UserRepository userRepository;
     private final ProjectRepository projectRepository;
+
 
     @Autowired
     public ProjectStatusService(ProjectStatusRepository projectStatusRepository,
@@ -41,33 +39,38 @@ public class ProjectStatusService {
         this.projectRepository = projectRepository;
     }
 
-    public List<ProjectResponse> getRecommendProjectsByStatus(String status, long userId) {
+    public List<ProjectResponse> getRecommendProjectsByStatus(String status, UUID userId) {
         User user = userRepository.findUserById(userId);
         if (user == null) {
             logger.info("User not found");
             return new ArrayList<>();
         }
 
-        List<Long> recommendProjectIds = getRecommendProjectIds(
+        List<UUID> recommendProjectIds = getRecommendProjectIds(
                 user.getProfileDescription());
         List<Project> projects = getProjectsByStatus(status);
         List<Project> sortedProjects = sortProjects(recommendProjectIds, projects);
         return convertToProjectResponses(sortedProjects);
     }
 
-    public List<Long> getRecommendProjectIds(String s) {
+    public List<UUID> getRecommendProjectIds(String s) {
         List<Document> recommendProjects = vectorStore.similaritySearch(SearchRequest.defaults()
                 .withQuery(s)
                 .withTopK(10));
 
-        List<Long> recommendProjectIds = new ArrayList<>();
+        List<UUID> recommendProjectIds = new ArrayList<>();
         for (Document document : recommendProjects) {
             Map<String, Object> metaData =  document.getMetadata();
-            Double projectIdDouble = (Double) metaData.get("project_id");
-            Long projectId = projectIdDouble.longValue();
+            String projectIdString = (String) metaData.get("project_id");
 
-            if (!recommendProjectIds.contains(projectId)) {
-                recommendProjectIds.add(projectId);
+            try {
+                UUID projectId = UUID.fromString(projectIdString);
+
+                if (!recommendProjectIds.contains(projectId)) {
+                    recommendProjectIds.add(projectId);
+                }
+            } catch (IllegalArgumentException e) {
+                logger.error("Invalid UUID format: " + projectIdString);
             }
         }
         return recommendProjectIds;
@@ -76,19 +79,19 @@ public class ProjectStatusService {
     private List<Project> getProjectsByStatus(String status) {
         if (Objects.equals(status, "member_recruiting")) {
             return projectRepository.findProjectByProjectStatus(
-                    projectStatusRepository.findStatusById(1)
+                    projectStatusRepository.findByStatus("member_recruiting")
             );
         } else if (Objects.equals(status, "mentor_recruiting")) {
             return projectRepository.findProjectByProjectStatus(
-                    projectStatusRepository.findStatusById(2)
+                    projectStatusRepository.findByStatus("mentor_recruiting")
             );
         }
         return new ArrayList<>();
     }
 
-    private List<Project> sortProjects(List<Long> recommendProjectIds, List<Project> projects) {
+    private List<Project> sortProjects(List<UUID> recommendProjectIds, List<Project> projects) {
         List<Project> sortedProjects = new ArrayList<>();
-        for (Long projectId : recommendProjectIds) {
+        for (UUID projectId : recommendProjectIds) {
             for (Project project : projects) {
                 if (Objects.equals(project.getId(), projectId)) {
                     sortedProjects.add(project);

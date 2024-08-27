@@ -5,16 +5,19 @@ import jakarta.persistence.*;
 import com.ideasync.ideasyncbackend.project.Project;
 import com.ideasync.ideasyncbackend.user.User;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 
 import java.sql.Timestamp;
+import java.sql.Types;
+import java.util.UUID;
 
 @Entity
 @Table(name = "applicant")
 public class Applicant {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  @Id @GeneratedValue
+  @JdbcTypeCode(Types.VARCHAR)
+  private UUID id;
 
   @CreationTimestamp
   @Column(name = "createAt", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
@@ -41,7 +44,7 @@ public class Applicant {
     this.verified = verified;
   }
 
-  public Long getId() {
+  public UUID getId() {
     return id;
   }
 
@@ -57,7 +60,7 @@ public class Applicant {
     return project;
   }
 
-  public void setId(Long id) {
+  public void setId(UUID id) {
     this.id = id;
   }
 

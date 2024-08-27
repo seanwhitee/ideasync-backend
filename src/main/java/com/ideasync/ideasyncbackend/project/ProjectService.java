@@ -81,7 +81,7 @@ public class ProjectService {
     public boolean isValidProjectData(ProjectRequest projectRequest) {
         String title = projectRequest.getTitle();
         String description = projectRequest.getDescription();
-        Long statusId = projectRequest.getStatusId();
+        String statusId = projectRequest.getStatus();
         String requireSkills = projectRequest.getRequireSkills();
         String school = projectRequest.getSchool();
         int allowApplicantsNum = projectRequest.getAllowApplicantsNum();
@@ -97,7 +97,7 @@ public class ProjectService {
                 && (allowApplicantsNum != 0);
     }
 
-    public List<ProjectResponse> getProjectsByUser(Long userId) {
+    public List<ProjectResponse> getProjectsByUser(UUID userId) {
         List<Project> projects = projectRepository.findProjectsByUser(userRepository.findUserById(userId));
         List<ProjectResponse> responses = new ArrayList<>();
         for (Project project : projects) {
@@ -135,7 +135,7 @@ public class ProjectService {
         return new ProjectResponse(
                 project.getId(),
                 userService.getUserResponse(project.getUser()),
-                project.getProjectStatus().getId(),
+                project.getProjectStatus().getStatus(),
                 project.getTitle(),
                 project.getDescription(),
                 project.getSchool(),
@@ -179,14 +179,11 @@ public class ProjectService {
             return "Project with the same title already exists";
         }
 
-        ProjectStatus projectStatus = new ProjectStatus();
-        projectStatus.setId(projectRequest.getStatusId());
-
         // set project data
         project.setUser(user.get());
         project.setTitle(projectRequest.getTitle());
         project.setDescription(projectRequest.getDescription());
-        project.setProjectStatus(projectStatus);
+        project.setProjectStatus(projectStatusRepository.findByStatus(projectRequest.getStatus()));
         project.setGraduationProject(projectRequest.getGraduationProject());
         project.setSchool(projectRequest.getSchool());
         project.setAllowApplicantsNum(projectRequest.getAllowApplicantsNum());
@@ -253,7 +250,7 @@ public class ProjectService {
      * @param id project id
      * @return success message
      */
-    public String deleteProjectById(Long id) {
+    public String deleteProjectById(UUID id) {
 
         Optional<Project> project = projectRepository.findById(id);
 
@@ -292,12 +289,12 @@ public class ProjectService {
         return "Project not found";
     }
 
-    public ProjectResponse getProjectById(Long id) {
+    public ProjectResponse getProjectById(UUID id) {
         Optional<Project> project = projectRepository.findById(id);
         return project.map(this::setProjectResponse).orElse(null);
     }
 
-    public List<ProjectResponse> getRelatedProjects(Long projectId) {
+    public List<ProjectResponse> getRelatedProjects(UUID projectId) {
         /* Prepare feature string to get recommendation */
         StringBuilder s = new StringBuilder();
         Project p = projectRepository.findProjectById(projectId);
@@ -305,23 +302,25 @@ public class ProjectService {
             s.append(t.getName());
         }
         s.append(p.getDescription());
-        List<Long> relatedProjectIds = projectStatusService.getRecommendProjectIds(s.toString());
+        List<UUID> relatedProjectIds = projectStatusService.getRecommendProjectIds(s.toString());
         // filter out the one with id equals to projectId
         relatedProjectIds.remove(projectId);
         List<ProjectResponse> responses = new ArrayList<>();
-        for (Long id: relatedProjectIds) {
+        for (UUID id: relatedProjectIds) {
             responses.add(getProjectById(id));
         }
         return responses;
     }
 
-    public ProjectResponse changeProjectStatus(Long projectId, Long changeToWhat, String nextOrPrevious) {
+    public ProjectResponse changeProjectStatus(UUID projectId, String changeToWhat, String nextOrPrevious) {
         Project project = projectRepository.findProjectById(projectId);
         if (nextOrPrevious.equals("next")) {
             // check if applicants all reviewed
             List<Applicant> applicants = applicantRepository.findApplicantsByProject(project);
             for (Applicant app: applicants) {
-                if (app.getVerified() == 0) {
+                if (app.getVerified() == 0
+                        && (project.getProjectStatus().getStatus().equals("member_recruiting") && app.getUser().getUserRole().getRoleName().equals("creator"))
+                && (project.getProjectStatus().getStatus().equals("mentor_recruiting") && app.getUser().getUserRole().getRoleName().equals("mentor"))) {
                     return null;
                 }
             }
@@ -340,7 +339,7 @@ public class ProjectService {
             }
         }
         try {
-            ProjectStatus statusChangeTo = projectStatusRepository.findStatusById(changeToWhat);
+            ProjectStatus statusChangeTo = projectStatusRepository.findByStatus(changeToWhat);
             project.setProjectStatus(statusChangeTo);
             projectRepository.save(project);
         } catch (Exception e) {

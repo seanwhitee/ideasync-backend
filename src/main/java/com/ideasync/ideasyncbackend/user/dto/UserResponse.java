@@ -1,7 +1,9 @@
 package com.ideasync.ideasyncbackend.user.dto;
 
+import java.util.UUID;
+
 public class UserResponse {
-  private Long id;
+  private UUID id;
   private String nickName;
   private String avatarUrl;
   private String roleName;
@@ -15,7 +17,7 @@ public class UserResponse {
 
   // Getters and setters
 
-  public Long getId() {
+  public UUID getId() {
     return id;
   }
 
@@ -59,7 +61,7 @@ public class UserResponse {
     return roleVerified;
   }
 
-  public void setId(Long id) {
+  public void setId(UUID id) {
     this.id = id;
   }
 
