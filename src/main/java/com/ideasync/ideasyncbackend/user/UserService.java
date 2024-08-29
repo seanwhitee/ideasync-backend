@@ -2,7 +2,10 @@ package com.ideasync.ideasyncbackend.user;
 
 
 import com.ideasync.ideasyncbackend.applicant.ApplicantRepository;
+import com.ideasync.ideasyncbackend.authorization.AuthorizationService;
+import com.ideasync.ideasyncbackend.authorization.dto.Token;
 import com.ideasync.ideasyncbackend.comment.CommentRepository;
+import com.ideasync.ideasyncbackend.user.dto.LoginResponse;
 import com.ideasync.ideasyncbackend.user.dto.RegisterRequest;
 
 import com.ideasync.ideasyncbackend.user.dto.UserResponse;
@@ -36,14 +39,16 @@ public class UserService {
   private final ApplicantRepository applicantRepository;
   private final UserRoleRepository userRoleRepository;
   private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+  private final AuthorizationService authorizationService;
 
   @Autowired
-  public UserService(UserRepository userRepository, JavaMailSender emailSender, CommentRepository commentRepository, ApplicantRepository applicantRepository, UserRoleRepository userRoleRepository) {
+  public UserService(UserRepository userRepository, JavaMailSender emailSender, CommentRepository commentRepository, ApplicantRepository applicantRepository, UserRoleRepository userRoleRepository, AuthorizationService authorizationService) {
     this.userRepository = userRepository;
     this.emailSender = emailSender;
     this.commentRepository = commentRepository;
     this.applicantRepository = applicantRepository;
     this.userRoleRepository = userRoleRepository;
+    this.authorizationService = authorizationService;
   }
 
   /**
@@ -53,7 +58,7 @@ public class UserService {
    * @param password password of user
    * @return UserResponse
    */
-  public UserResponse userLogin(String username, String password) {
+  public LoginResponse userLogin(String username, String password) throws Exception {
     User userData = userRepository.findByUserName(username);
 
     // check if user exist, and user role is verified
@@ -63,7 +68,11 @@ public class UserService {
 
     // check if password is correct
     if (userData.getPassword().equals(password)) {
-      return getUserResponse(userData);
+      UserResponse userResponse = getUserResponse(userData);
+      String accessToken = authorizationService.generateToken();
+      Token token = new Token(accessToken);
+      return new LoginResponse(token, userResponse);
+
     }
 
     // return null if password is incorrect

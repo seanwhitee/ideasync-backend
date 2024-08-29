@@ -1,5 +1,6 @@
 package com.ideasync.ideasyncbackend.user;
 
+import com.ideasync.ideasyncbackend.user.dto.LoginResponse;
 import com.ideasync.ideasyncbackend.user.dto.RegisterRequest;
 import com.ideasync.ideasyncbackend.user.dto.UserResponse;
 import org.springframework.web.bind.annotation.*;
@@ -40,13 +41,13 @@ public class UserController {
     return userService.saveUserData(userRequest);
   }
 
-  @GetMapping("/{id}")
-  public UserResponse getUser(@PathVariable UUID id) {
+  @GetMapping("/getDetail")
+  public UserResponse getUser(@RequestParam UUID id) {
     return userService.getUser(id);
   }
 
   @GetMapping("/login")
-  public UserResponse userLogin(@RequestParam String username, @RequestParam String password) {
+  public LoginResponse userLogin(@RequestParam String username, @RequestParam String password) throws Exception {
     return userService.userLogin(username, password);
   }
 

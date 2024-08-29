@@ -2,6 +2,7 @@ package com.ideasync.ideasyncbackend.project;
 
 import com.ideasync.ideasyncbackend.project.dto.ProjectRequest;
 import com.ideasync.ideasyncbackend.project.dto.ProjectResponse;
+import com.ideasync.ideasyncbackend.project.dto.Setting;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,8 +29,8 @@ public class ProjectController {
     }
 
     @GetMapping("/getProjectsByUser")
-    public List<ProjectResponse> getProjectsByUser(@RequestParam UUID userId) {
-        return projectService.getProjectsByUser(userId);
+    public List<ProjectResponse> getProjectsByUser(@RequestParam UUID userId, @RequestParam Boolean includePrivate) {
+        return projectService.getProjectsByUser(userId, includePrivate);
     }
 
     @DeleteMapping("/delete")
@@ -39,8 +40,8 @@ public class ProjectController {
 
 
     @GetMapping("/getProjectById")
-    public ProjectResponse getProjectById(@RequestParam UUID id) {
-        return projectService.getProjectById(id);
+    public ProjectResponse getProjectById(@RequestParam UUID userId, @RequestParam UUID projectId) {
+        return projectService.getProjectById(userId, projectId);
     }
 
     @GetMapping("/getRelatedProjects")
@@ -53,6 +54,12 @@ public class ProjectController {
                                                @RequestParam String status,
                                                @RequestParam String nextOrPrevious) {
         return projectService.changeProjectStatus(projectId, status, nextOrPrevious);
+    }
+
+    @PatchMapping("/updateSetting")
+    public ProjectResponse updateSetting(
+                                @RequestBody Setting setting) {
+        return projectService.updateSetting(setting);
     }
 }
 

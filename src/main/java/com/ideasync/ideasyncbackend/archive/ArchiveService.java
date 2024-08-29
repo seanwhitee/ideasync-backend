@@ -64,7 +64,7 @@ public class ArchiveService {
             }
         }
 
-        return projectResponses;
+        return projectService.filterPrivate(projectResponses);
 
     }
     public String addArchive(UUID projectId, UUID userId) {

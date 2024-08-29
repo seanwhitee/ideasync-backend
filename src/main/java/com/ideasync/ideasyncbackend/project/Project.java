@@ -32,6 +32,9 @@ public class Project {
   @Column(nullable = false)
   private String description;
 
+  @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT TRUE")
+  private boolean isPublic;
+
   @ManyToOne
   @JoinColumn(name = "statusId", nullable = false)
   private ProjectStatus projectStatus;
@@ -63,6 +66,14 @@ public class Project {
 
   @OneToMany(mappedBy = "project", cascade = {CascadeType.REMOVE, CascadeType.MERGE})
   private List<Applicant> applicants;
+
+  public boolean isPublic() {
+    return isPublic;
+  }
+
+  public void setPublic(boolean aPublic) {
+    isPublic = aPublic;
+  }
 
   public String getRequireSkills() {
     return requireSkills;
