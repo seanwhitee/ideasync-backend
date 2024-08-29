@@ -50,7 +50,8 @@ public class ProjectStatusService {
                 user.getProfileDescription());
         List<Project> projects = getProjectsByStatus(status);
         List<Project> sortedProjects = sortProjects(recommendProjectIds, projects);
-        return convertToProjectResponses(sortedProjects);
+
+        return projectService.filterPrivate(convertToProjectResponses(sortedProjects));
     }
 
     public List<UUID> getRecommendProjectIds(String s) {

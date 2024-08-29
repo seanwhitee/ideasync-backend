@@ -17,6 +17,7 @@ public class ProjectResponse {
     private String school;
     private int allowApplicantsNum;
     private boolean isGraduationProject;
+    private boolean isPublic;
     private Timestamp createAt;
     private List<String> images;
     private List<String> tags;
@@ -32,6 +33,7 @@ public class ProjectResponse {
                            String school,
                            int allowApplicantsNum,
                            boolean isGraduationProject,
+                           boolean isPublic,
                            Timestamp createAt,
                            List<String> images,
                            List<String> tags,
@@ -46,12 +48,20 @@ public class ProjectResponse {
         this.school = school;
         this.allowApplicantsNum = allowApplicantsNum;
         this.isGraduationProject = isGraduationProject;
+        this.isPublic = isPublic;
         this.createAt = createAt;
         this.images = images;
         this.tags = tags;
         this.requireSkills = requireSkills;
         this.applicants = applicants;
         this.commentChunks = commentChunks;
+    }
+    public boolean isPublic() {
+        return isPublic;
+    }
+
+    public void setPublic(boolean aPublic) {
+        isPublic = aPublic;
     }
 
     public String getRequireSkills() {

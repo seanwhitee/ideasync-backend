@@ -9,6 +9,7 @@ import com.ideasync.ideasyncbackend.comment.CommentRepository;
 import com.ideasync.ideasyncbackend.comment.CommentService;
 import com.ideasync.ideasyncbackend.project.dto.ProjectRequest;
 import com.ideasync.ideasyncbackend.project.dto.ProjectResponse;
+import com.ideasync.ideasyncbackend.project.dto.Setting;
 import com.ideasync.ideasyncbackend.projectimage.ProjectImage;
 import com.ideasync.ideasyncbackend.projectimage.ProjectImageRepository;
 import com.ideasync.ideasyncbackend.projectstatus.ProjectStatus;
@@ -97,11 +98,14 @@ public class ProjectService {
                 && (allowApplicantsNum != 0);
     }
 
-    public List<ProjectResponse> getProjectsByUser(UUID userId) {
+    public List<ProjectResponse> getProjectsByUser(UUID userId, Boolean includePrivate) {
         List<Project> projects = projectRepository.findProjectsByUser(userRepository.findUserById(userId));
         List<ProjectResponse> responses = new ArrayList<>();
         for (Project project : projects) {
             responses.add(setProjectResponse(project));
+        }
+        if (includePrivate.equals(false)) {
+            return filterPrivate(responses);
         }
         return responses;
     }
@@ -114,6 +118,20 @@ public class ProjectService {
             }
         }
         return true;
+    }
+
+    public ProjectResponse updateSetting(Setting setting) {
+
+        Project project = projectRepository.findProjectById(setting.getProjectId());
+        project.setPublic(setting.isPublic());
+        try {
+            project = projectRepository.save(project);
+        } catch (Exception e) {
+            logger.error("Error updating project setting", e);
+        }
+
+        return setProjectResponse(project);
+
     }
 
     public ProjectResponse setProjectResponse(Project project) {
@@ -141,6 +159,7 @@ public class ProjectService {
                 project.getSchool(),
                 project.getAllowApplicantsNum(),
                 project.isGraduationProject(),
+                project.isPublic(),
                 project.getCreateAt(),
                 images,
                 tagNames,
@@ -240,7 +259,7 @@ public class ProjectService {
         for (Project project : projects) {
             result.add(setProjectResponse(project));
         }
-        return result;
+        return filterPrivate(result);
     }
 
 
@@ -289,11 +308,31 @@ public class ProjectService {
         return "Project not found";
     }
 
-    public ProjectResponse getProjectById(UUID id) {
-        Optional<Project> project = projectRepository.findById(id);
+    private ProjectResponse getDetail(UUID projectId) {
+        Optional<Project> project = projectRepository.findById(projectId);
         return project.map(this::setProjectResponse).orElse(null);
     }
 
+    public ProjectResponse getProjectById(UUID userId, UUID projectId) {
+        Optional<Project> project = projectRepository.findById(projectId);
+        Optional<User> user = userRepository.findById(userId);
+        if (project.isEmpty() || user.isEmpty()) {
+            return null;
+        }
+        if (!project.get().isPublic() && (user.get().getId() != project.get().getUser().getId())) {
+            return null;
+        }
+        return project.map(this::setProjectResponse).orElse(null);
+    }
+    public List<ProjectResponse> filterPrivate(List<ProjectResponse> projectsRes) {
+        List<ProjectResponse> publicProjects = new ArrayList<>();
+        for (ProjectResponse res : projectsRes) {
+            if (res.isPublic()) {
+                publicProjects.add(res);
+            }
+        }
+        return publicProjects;
+    }
     public List<ProjectResponse> getRelatedProjects(UUID projectId) {
         /* Prepare feature string to get recommendation */
         StringBuilder s = new StringBuilder();
@@ -307,9 +346,9 @@ public class ProjectService {
         relatedProjectIds.remove(projectId);
         List<ProjectResponse> responses = new ArrayList<>();
         for (UUID id: relatedProjectIds) {
-            responses.add(getProjectById(id));
+            responses.add(getDetail(id));
         }
-        return responses;
+        return filterPrivate(responses);
     }
 
     public ProjectResponse changeProjectStatus(UUID projectId, String changeToWhat, String nextOrPrevious) {
