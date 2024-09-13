@@ -2,6 +2,7 @@ package com.ideasync.ideasyncbackend.user;
 
 import com.ideasync.ideasyncbackend.user.dto.LoginResponse;
 import com.ideasync.ideasyncbackend.user.dto.RegisterRequest;
+import com.ideasync.ideasyncbackend.user.dto.UpdateRequest;
 import com.ideasync.ideasyncbackend.user.dto.UserResponse;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,7 +12,7 @@ import java.util.UUID;
 
 @CrossOrigin
 @RestController
-@RequestMapping(path = "api/v1/users")
+@RequestMapping("/api/v1/users")
 public class UserController {
   private final UserService userService;
   // get env
@@ -30,9 +31,9 @@ public class UserController {
     return userService.deleteUser(id);
   }
 
-  @PostMapping("/register")
-  public String registerUser(@RequestBody User user) {
-    return userService.registerUser(user);
+  @PostMapping("/checkUserData")
+  public String checkUserData(@RequestBody User user) {
+    return userService.checkUserData(user);
   }
 
   @PostMapping("/saveUserData")
@@ -51,9 +52,9 @@ public class UserController {
     return userService.userLogin(username, password);
   }
 
-  @PatchMapping("/updateRoleStatus")
-  public String updateRoleStatus(@RequestParam UUID id, @RequestParam boolean status) {
-    return userService.updateRoleStatus(id, status);
+  @PatchMapping("/updateUser")
+  public UserResponse updateUser(@RequestBody UpdateRequest user) {
+    return userService.updateUser(user);
   }
 
   @GetMapping("/getAllUsers")

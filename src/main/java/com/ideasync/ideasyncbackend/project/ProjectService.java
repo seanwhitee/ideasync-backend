@@ -4,6 +4,7 @@ package com.ideasync.ideasyncbackend.project;
 import com.ideasync.ideasyncbackend.applicant.Applicant;
 import com.ideasync.ideasyncbackend.applicant.ApplicantRepository;
 import com.ideasync.ideasyncbackend.applicant.ApplicantService;
+import com.ideasync.ideasyncbackend.applicant.dto.ApplicantResponse;
 import com.ideasync.ideasyncbackend.archive.ArchiveRepository;
 import com.ideasync.ideasyncbackend.comment.CommentRepository;
 import com.ideasync.ideasyncbackend.comment.CommentService;
@@ -121,9 +122,9 @@ public class ProjectService {
     }
 
     public ProjectResponse updateSetting(Setting setting) {
-
         Project project = projectRepository.findProjectById(setting.getProjectId());
         project.setPublic(setting.isPublic());
+        project.setProjectStatus(projectStatusRepository.findByStatus(setting.getStatusName()));
         try {
             project = projectRepository.save(project);
         } catch (Exception e) {
@@ -207,6 +208,9 @@ public class ProjectService {
         project.setSchool(projectRequest.getSchool());
         project.setAllowApplicantsNum(projectRequest.getAllowApplicantsNum());
         project.setRequireSkills(projectRequest.getRequireSkills());
+
+        // default visibility is public for new created project
+        project.setPublic(true);
 
         try {
             projectRepository.save(project);
@@ -313,13 +317,15 @@ public class ProjectService {
         return project.map(this::setProjectResponse).orElse(null);
     }
 
-    public ProjectResponse getProjectById(UUID userId, UUID projectId) {
+    public ProjectResponse getProjectById(UUID userId, UUID projectId, Boolean includePrivate) {
         Optional<Project> project = projectRepository.findById(projectId);
         Optional<User> user = userRepository.findById(userId);
         if (project.isEmpty() || user.isEmpty()) {
             return null;
         }
-        if (!project.get().isPublic() && (user.get().getId() != project.get().getUser().getId())) {
+        if ((!project.get().isPublic() && !user.get().getUserRole().getRoleName().equals("admin"))
+                && (user.get().getId() != project.get().getUser().getId())
+                && includePrivate.equals(false)) {
             return null;
         }
         return project.map(this::setProjectResponse).orElse(null);
@@ -349,6 +355,48 @@ public class ProjectService {
             responses.add(getDetail(id));
         }
         return filterPrivate(responses);
+    }
+
+    public List<ProjectResponse> getProjects() {
+        List<Project> projects = projectRepository.findAll();
+        // turn projects to projectResponses
+        List<ProjectResponse> responses = new ArrayList<>();
+        for (Project project : projects) {
+            List<String> images = new ArrayList<>();
+            List<String> tags = new ArrayList<>();
+            List<ApplicantResponse> applicants = new ArrayList<>();
+            for (ProjectImage img: projectImageRepository.findProjectImagesByProject(project)) {
+                images.add(img.getImageUrl());
+            }
+            for (Tag tag: tagRepository.findTagsByProject(project)) {
+                tags.add(tag.getName());
+            }
+            for (Applicant app: applicantRepository.findApplicantsByProject(project)) {
+                applicants.add(new ApplicantResponse(
+                        userService.getUserResponse(app.getUser()),
+                        app.getVerified()
+                ));
+            }
+            responses.add(new ProjectResponse(
+                    project.getId(),
+                    userService.getUserResponse(project.getUser()),
+                    project.getProjectStatus()
+                            .getStatus(),
+                    project.getTitle(),
+                    project.getDescription(),
+                    project.getSchool(),
+                    project.getAllowApplicantsNum(),
+                    project.isGraduationProject(),
+                    project.isPublic(),
+                    project.getCreateAt(),
+                    images,
+                    tags,
+                    project.getRequireSkills(),
+                    applicants,
+                    commentService.getAllCommentChunks(project.getId())
+            ));
+        }
+        return responses;
     }
 
     public ProjectResponse changeProjectStatus(UUID projectId, String changeToWhat, String nextOrPrevious) {

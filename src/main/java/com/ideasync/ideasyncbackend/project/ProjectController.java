@@ -40,8 +40,14 @@ public class ProjectController {
 
 
     @GetMapping("/getProjectById")
-    public ProjectResponse getProjectById(@RequestParam UUID userId, @RequestParam UUID projectId) {
-        return projectService.getProjectById(userId, projectId);
+    public ProjectResponse getProjectById(@RequestParam UUID userId, @RequestParam UUID projectId,
+                                          @RequestParam Boolean includePrivate) {
+        return projectService.getProjectById(userId, projectId, includePrivate);
+    }
+
+    @GetMapping("/getProjects")
+    public List<ProjectResponse> getProjects() {
+        return projectService.getProjects();
     }
 
     @GetMapping("/getRelatedProjects")

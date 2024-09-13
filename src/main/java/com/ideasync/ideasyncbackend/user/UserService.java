@@ -8,6 +8,7 @@ import com.ideasync.ideasyncbackend.comment.CommentRepository;
 import com.ideasync.ideasyncbackend.user.dto.LoginResponse;
 import com.ideasync.ideasyncbackend.user.dto.RegisterRequest;
 
+import com.ideasync.ideasyncbackend.user.dto.UpdateRequest;
 import com.ideasync.ideasyncbackend.user.dto.UserResponse;
 import com.ideasync.ideasyncbackend.userrole.UserRole;
 import com.ideasync.ideasyncbackend.userrole.UserRoleRepository;
@@ -166,7 +167,7 @@ public class UserService {
    * @param user user data
    * @return String
    */
-  public String registerUser(User user) {
+  public String checkUserData(User user) {
     User existingUser = userRepository.findByUserName(user.getUserName());
     if (existingUser != null) {
       return "user already exist";
@@ -298,15 +299,25 @@ public class UserService {
     return "User not found";
   }
 
-  public String updateRoleStatus(UUID id, boolean status) {
-    Optional<User> user = userRepository.findById(id);
-    if (user.isPresent()) {
-      user.get().setRoleVerified(status);
-      userRepository.save(user.get());
-      return "Role status updated successfully";
+  public UserResponse updateUser(UpdateRequest user) {
+    Optional<User> userData = userRepository.findById(user.getId());
+    if (userData.isPresent()) {
+      User userToUpdate = userData.get();
+      userToUpdate.setNickName(user.getNickName());
+      userToUpdate.setAvatarUrl(user.getAvatarUrl());
+      userToUpdate.setUserRole(userRoleRepository.findUserRoleByRoleName(user.getRoleName()));
+      userToUpdate.setProfileDescription(user.getProfileDescription());
+      userToUpdate.setEmail(user.getEmail());
+      userToUpdate.setFirstName(user.getFirstName());
+      userToUpdate.setLastName(user.getLastName());
+      userToUpdate.setAllowProjectApply(user.isAllowProjectApply());
+      userToUpdate.setAllowProjectCreate(user.isAllowProjectCreate());
+      userToUpdate.setRoleVerified(user.isRoleVerified());
+      return getUserResponse(userRepository.save(userToUpdate));
     }
-    return "User not found";
+    return null;
   }
+
 
   public List<UserResponse> getAllUsers() {
     List<User> users = userRepository.findAll();
