@@ -1,6 +1,5 @@
 package com.ideasync.ideasyncbackend.authorization;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -12,16 +11,16 @@ import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.security.web.SecurityFilterChain;
-
-import java.security.interfaces.RSAPublicKey;
 import java.util.List;
 
 
 @Configuration
 public class SecurityConfig {
+    private final AuthorizationService authorizationService;
 
-    @Value("${spring.security.oauth2.resourceserver.jwt.public-key-location}")
-    private RSAPublicKey key;
+    public SecurityConfig(AuthorizationService authorizationService) {
+        this.authorizationService = authorizationService;
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -48,9 +47,9 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtDecoder jwtDecoder() {
+    public JwtDecoder jwtDecoder() throws Exception {
         final NimbusJwtDecoder decoder = NimbusJwtDecoder
-                .withPublicKey(this.key)
+                .withPublicKey(authorizationService.getPublicKey())
                 .build();
         decoder.setJwtValidator(tokenValidator());
         return decoder;
