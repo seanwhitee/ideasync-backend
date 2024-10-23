@@ -7,6 +7,7 @@ import com.auth0.jwt.exceptions.JWTCreationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 
@@ -27,11 +28,21 @@ import java.util.Base64;
 @Service
 public class AuthorizationService {
 
+    @Value("${PUBLIC_KEY}")
+    private String publicKeyContent;
+
+    @Value("${PRIVATE_KEY}")
+    private String privateKeyContent;
+
+
     private static final Logger log = LoggerFactory.getLogger(AuthorizationService.class);
 
+
     public String generateToken() throws Exception {
+
         RSAPublicKey rsaPublicKey = getPublicKey();
         RSAPrivateKey rsaPrivateKey = getPrivateKey();
+
         try {
             Algorithm algorithm = Algorithm.RSA256(rsaPublicKey, rsaPrivateKey);
             return JWT.create()
@@ -46,9 +57,8 @@ public class AuthorizationService {
         }
     }
 
-    public static RSAPublicKey getPublicKey() throws Exception {
+    public RSAPublicKey getPublicKey() throws Exception {
         try {
-            String publicKeyContent = Files.readString(Paths.get(ClassLoader.getSystemResource("public.key").toURI()), Charset.defaultCharset());
             publicKeyContent = publicKeyContent
                     .replaceAll("\\n", "")
                     .replace("-----BEGIN PUBLIC KEY-----", "")
@@ -64,9 +74,9 @@ public class AuthorizationService {
         }
     }
 
-    public static RSAPrivateKey getPrivateKey() throws Exception {
+    public RSAPrivateKey getPrivateKey() throws Exception {
         try {
-            String privateKeyContent = Files.readString(Paths.get(ClassLoader.getSystemResource("private.key").toURI()), Charset.defaultCharset());
+
             privateKeyContent = privateKeyContent
                     .replaceAll("\\n", "")
                     .replace("-----BEGIN PRIVATE KEY-----", "")
